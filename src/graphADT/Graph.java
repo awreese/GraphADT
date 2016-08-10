@@ -244,8 +244,10 @@ public interface Graph<V, E> {
      * @param v2 - the second vertex to remove edge from
      * @return set of removed edges or <code>null</code> if either vertex is not
      *         part of this graph
+     * @throws NullPointerException if vertex values <code>v1</code> or
+     *             <code>v2</code> are <code>null</code>
      */
-    Set<E> removeAllEdges(V v1, V v2);
+    Set<E> removeAllEdges(V v1, V v2) throws NullPointerException;
 
     /**
      * Removes all the vertices in this graph that are also contained in the
@@ -284,8 +286,10 @@ public interface Graph<V, E> {
      * @param v1 - the first vertex value to remove edge from
      * @param v2 - the second vertex value to remove edge from
      * @return the removed edge, or <code>null</code> if graph was not modified
+     * @throws NullPointerException if vertex values <code>v1</code> or
+     *             <code>v2</code> are <code>null</code>
      */
-    E removeEdge(V v1, V v2);
+    E removeEdge(V v1, V v2) throws NullPointerException;
 
     /**
      * Removes the specified vertex <code>v</code> from this graph if it is

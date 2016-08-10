@@ -2,6 +2,7 @@ package graphADT;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -30,8 +31,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     private static final boolean RUN_CHECKREP = false;
 
     /**
-     * Edge class stores vertex pairing and edge value that defines an edge in
-     * the parent graph.
+     * Edge class stores vertex pairing that defines an edge in the parent
+     * graph.
      * 
      * While edge values e are allowed to be null, by definition the graph
      * vertices must not be null. The vertices are guaranteed to not be null as
@@ -53,21 +54,21 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     }
 
     /* internal representation of basic undirected graph */
-    private Set<V>    vertices;
-    private Set<Edge> edges;
+    private Set<V>    vertexSet;
+    private Set<Edge> edgeSet;
 
     // Abstraction Function:
-    // A basic undirected graph is an ADT that contains both vertices and the
-    // edges between them. This graph stores a set of vertices and a set of
+    // A basic undirected graph is an ADT that contains both vertexSet and the
+    // edges between them. This graph stores a set of vertexSet and a set of
     // edges.
 
     // Representation Invariant:
-    // foreach vertex v in vertices, v != null
+    // foreach vertex v in vertexSet, v != null
     // foreach edge e in edges, e != null
 
     public BasicUndirectedGraph() {
-        this.vertices = new HashSet<V>();
-        this.edges = new HashSet<Edge>();
+        this.vertexSet = new HashSet<V>();
+        this.edgeSet = new HashSet<Edge>();
         checkRep();
     }
 
@@ -77,7 +78,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
             throw new NullPointerException("Vertex value null");
         }
 
-        boolean result = vertices.add(v);
+        boolean result = vertexSet.add(v);
         checkRep();
         return result;
     }
@@ -92,8 +93,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         }
-        
-        boolean result = edges.add(new Edge(v1, v2, e));
+
+        boolean result = edgeSet.add(new Edge(v1, v2, e));
         checkRep();
         return result;
     }
@@ -103,7 +104,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v == null) {
             return false;
         } else {
-            return vertices.contains(v);
+            return vertexSet.contains(v);
         }
     }
 
@@ -112,7 +113,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (e == null) {
             return false;
         } else {
-            for (Edge edge : edges) {
+            for (Edge edge : edgeSet) {
                 if (edge.e.equals(e)) {
                     return true;
                 }
@@ -126,53 +127,80 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         }
-        
-        // if either vertex is not in graph, return false
-        if (!(containsVertex(v1) && containsVertex(v2))) {
-            return false;
-        } else {
-            for (Edge e : edges) {
-                if ((e.v1.equals(v1) && e.v2.equals(v2)) ||
-                    (e.v1.equals(v2) && e.v2.equals(v1))   ) {
+
+        // if both vertexSet in graph, check for edge
+        if (containsVertex(v1) && containsVertex(v2)) {
+            for (Edge e : edgeSet) {
+                if ((e.v1.equals(v1) && e.v2.equals(v2))
+                        || (e.v1.equals(v2) && e.v2.equals(v1))) {
                     return true;
                 }
             }
-            return false;
         }
+        return false;
     }
 
     @Override
     public Set<? extends V> vertexSet() {
-
-        // TODO Auto-generated method stub
-        return null;
+        return new HashSet<V>(vertexSet);
     }
 
     @Override
     public Set<? extends E> edgeSet() {
-
-        // TODO Auto-generated method stub
-        return null;
+        Set<E> returnEdgeSet = new HashSet<E>();
+        for (Edge edge : edgeSet) {
+            returnEdgeSet.add(edge.e);
+        }
+        return returnEdgeSet;
     }
 
     @Override
     public Set<? extends E> edgeSet(V v) throws NullPointerException {
+        if (v == null) {
+            throw new NullPointerException("Vertex value null");
+        } else if (!containsVertex(v)) {
+            return null;
+        }
 
-        // TODO Auto-generated method stub
-        return null;
+        Set<E> returnEdgeSet = new HashSet<E>();
+        for (Edge edge : edgeSet) {
+            if (edge.v1.equals(v) || edge.v2.equals(v)) {
+                returnEdgeSet.add(edge.e);
+            }
+        }
+        return returnEdgeSet;
     }
 
     @Override
     public Set<? extends E> edgeSet(V v1, V v2) throws NullPointerException {
+        if (v1 == null || v2 == null) {
+            throw new NullPointerException("Vertex value null");
+        } else if (!(containsVertex(v1) && containsVertex(v2))) {
+            return null;
+        }
 
-        // TODO Auto-generated method stub
-        return null;
+        Set<E> returnEdgeSet = new HashSet<E>();
+        for (Edge edge : edgeSet) {
+            if ((edge.v1.equals(v1) && edge.v2.equals(v2))
+                    || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
+                returnEdgeSet.add(edge.e);
+            }
+        }
+        return returnEdgeSet;
     }
 
     @Override
     public E getEdge(V v1, V v2) throws NullPointerException {
-
-        // TODO Auto-generated method stub
+        if (v1 == null || v2 == null) {
+            throw new NullPointerException("Vertex value null");
+        } else if (containsVertex(v1) && containsVertex(v2)) {
+            for (Edge edge : edgeSet) {
+                if ((edge.v1.equals(v1) && edge.v2.equals(v2))
+                        || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
+                    return edge.e;
+                }
+            }
+        }
         return null;
     }
 
@@ -180,45 +208,154 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     public boolean removeAllEdges(Collection<? extends E> edges)
             throws NullPointerException {
 
-        // TODO Auto-generated method stub
-        return false;
+        if (edges == null) {
+            throw new NullPointerException("Edge collection null");
+        }
+
+        boolean modified = false;
+        Iterator<Edge> edgeItr = this.edgeSet.iterator();
+        while (edgeItr.hasNext()) {
+            Edge edge = edgeItr.next();
+
+            for (E edgeToRemove : edges) {
+                if (edge.e.equals(edgeToRemove)) {
+                    edgeItr.remove();
+                    modified = true;
+                    break;
+                }
+            }
+        }
+        checkRep();
+        return modified;
     }
 
     @Override
-    public Set<E> removeAllEdges(V v1, V v2) {
+    public Set<E> removeAllEdges(V v1, V v2) throws NullPointerException {
+        if (v1 == null || v2 == null) {
+            throw new NullPointerException("Vertex value null");
+        } else if (!(containsVertex(v1) && containsVertex(v2))) {
+            return null;
+        }
 
-        // TODO Auto-generated method stub
-        return null;
+        Set<E> removedEdgeSet = new HashSet<E>();
+        Iterator<Edge> edgeItr = this.edgeSet.iterator();
+
+        while (edgeItr.hasNext()) {
+            Edge edge = edgeItr.next();
+
+            if ((edge.v1.equals(v1) && edge.v2.equals(v2))
+                    || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
+                removedEdgeSet.add(edge.e);
+                edgeItr.remove();
+            }
+        }
+        checkRep();
+        return removedEdgeSet;
     }
 
     @Override
     public boolean removeAllVertices(Collection<? extends V> vertices)
             throws NullPointerException {
 
-        // TODO Auto-generated method stub
-        return false;
+        if (vertices == null) {
+            throw new NullPointerException("Vertex collection null");
+        }
+
+        boolean modified = false;
+        
+        for (V vertex : vertices) {
+            if (removeVertex(vertex)) {
+                modified = true;
+            }
+        }
+
+        return modified;
     }
 
+    /**
+     * {@inheritDoc}
+     * <br><br>
+     * Note: this method moves all duplicate edge values.
+     */
     @Override
     public boolean removeEdge(E e) {
+        boolean removed = false;
+        Iterator<Edge> edgeItr = this.edgeSet.iterator();
 
-        // TODO Auto-generated method stub
-        return false;
+        while (edgeItr.hasNext()) {
+            Edge edge = edgeItr.next();
+            if (edge.e.equals(e)) {
+                edgeItr.remove();
+                removed = true;
+            }
+        }
+
+        checkRep();
+        return removed;
     }
 
     @Override
-    public E removeEdge(V v1, V v2) {
+    public E removeEdge(V v1, V v2) throws NullPointerException {
+        if (v1 == null || v2 == null) {
+            throw new NullPointerException("Vertex value null");
+        } else if (!(containsVertex(v1) && containsVertex(v2))) {
+            return null;
+        }
+        
+        E returnValue = null;
+        Iterator<Edge> edgeItr = this.edgeSet.iterator();
 
-        // TODO Auto-generated method stub
-        return null;
+        while (edgeItr.hasNext()) {
+            Edge edge = edgeItr.next();
+
+            if ((edge.v1.equals(v1) && edge.v2.equals(v2))
+                    || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
+                returnValue = edge.e;
+                edgeItr.remove();
+                break;
+            }
+        }
+        
+        checkRep();
+        return returnValue;
     }
 
     @Override
     public boolean removeVertex(V v) {
-
-        // TODO Auto-generated method stub
-        return false;
+        // gather up and remove any Edges touching v
+        // if v == null or v !exist in graph, internal edge set is empty
+        edgeSet.remove(internalEdgeSet(v));
+        boolean result = vertexSet.remove(v);
+        checkRep();
+        return result;
     }
+
+    /**
+     * Returns a set of Edges that represent the edges that touch vertex v.
+     * 
+     * @param v - the vertex to return a set of touching edges from
+     * @return set of Edges that represent the edges that touch v
+     */
+    private Set<Edge> internalEdgeSet(V v) {
+        Set<Edge> returnEdgeSet = new HashSet<Edge>();
+        for (Edge edge : edgeSet) {
+            if (edge.v1.equals(v) || edge.v2.equals(v)) {
+                returnEdgeSet.add(edge);
+            }
+        }
+        return returnEdgeSet;
+    }
+
+    // private Set<Edge> internalEdgeSet(V v1, V v2) {
+    // Set<Edge> returnEdgeSet = new HashSet<Edge>();
+    // for (Edge edge : edgeSet) {
+    // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
+    // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
+    // returnEdgeSet.add(edge);
+    // }
+    // }
+    // return returnEdgeSet;
+    // }
 
     /**
      * Checks that the rep invariant holds
@@ -226,13 +363,13 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     private void checkRep() {
 
         if (RUN_CHECKREP) {
-            // check vertices
-            for (V v : this.vertices) {
+            // check vertexSet
+            for (V v : this.vertexSet) {
                 assert (v != null) : "Null vertex";
             }
 
             // check edges
-            for (Edge e : this.edges) {
+            for (Edge e : this.edgeSet) {
                 assert (e != null) : "Null edge";
             }
         }
