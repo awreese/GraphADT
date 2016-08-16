@@ -28,7 +28,7 @@ import java.util.Set;
 public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
 
     // DEBUGGING EXPENSIVE CHECKREP FLAG
-    private static final boolean RUN_CHECKREP = false;
+    private static final boolean RUN_CHECKREP = true;
 
     /**
      * Edge class stores vertex pairing that defines an edge in the parent
