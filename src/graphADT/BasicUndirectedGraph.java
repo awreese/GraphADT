@@ -15,7 +15,7 @@ import java.util.Set;
  * <h5>Abstract Invariant:</h5>
  * <ul>
  * <li>foreach vertex v in graph, v is not null</li>
- * <li>foreach edge e between vertices, e is not null</li>
+ * <li>foreach edge e between vertices in graph, e is not null</li>
  * </ul>
  * 
  * @author Drew Reese
@@ -51,6 +51,66 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
             this.v2 = v2;
             this.e = e;
         }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Object#hashCode()
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + ((e == null) ? 0 : e.hashCode());
+            result = prime * result + ((v1 == null) ? 0 : v1.hashCode())
+                    + ((v2 == null) ? 0 : v2.hashCode());
+            return result;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof BasicUndirectedGraph.Edge)) {
+                return false;
+            }
+
+            @SuppressWarnings("unchecked")
+            Edge other = (Edge) obj;
+            if (!getOuterType().equals(other.getOuterType())) {
+                return false;
+            }
+
+            if (!((v1.equals(other.v1) && v2.equals(other.v2))
+                    || (v1.equals(other.v2) && v2.equals(other.v1)))) {
+                return false;
+            }
+
+            if (e == null) {
+                if (other.e != null) {
+                    return false;
+                }
+            } else if (!e.equals(other.e)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private BasicUndirectedGraph<?,?> getOuterType() {
+            return BasicUndirectedGraph.this;
+        }
+
     }
 
     /* internal representation of basic undirected graph */
@@ -65,6 +125,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     // Representation Invariant:
     // foreach vertex v in vertexSet, v != null
     // foreach edge e in edges, e != null
+    //         vertex v1 in vertexSet
+    //         vertex v2 in vertexSet
 
     public BasicUndirectedGraph() {
         this.vertexSet = new HashSet<V>();
@@ -92,6 +154,9 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     public boolean addEdge(V v1, V v2, E e) throws NullPointerException {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
+        }
+        if (!(vertexSet.contains(v1) && vertexSet.contains(v2))) {
+            return false;
         }
 
         boolean result = edgeSet.add(new Edge(v1, v2, e));
@@ -262,7 +327,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         }
 
         boolean modified = false;
-        
+
         for (V vertex : vertices) {
             if (removeVertex(vertex)) {
                 modified = true;
@@ -273,8 +338,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     }
 
     /**
-     * {@inheritDoc}
-     * <br><br>
+     * {@inheritDoc} <br>
+     * <br>
      * Note: this method moves all duplicate edge values.
      */
     @Override
@@ -301,7 +366,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         } else if (!(containsVertex(v1) && containsVertex(v2))) {
             return null;
         }
-        
+
         E returnValue = null;
         Iterator<Edge> edgeItr = this.edgeSet.iterator();
 
@@ -315,7 +380,7 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
                 break;
             }
         }
-        
+
         checkRep();
         return returnValue;
     }
@@ -346,17 +411,6 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         return returnEdgeSet;
     }
 
-    // private Set<Edge> internalEdgeSet(V v1, V v2) {
-    // Set<Edge> returnEdgeSet = new HashSet<Edge>();
-    // for (Edge edge : edgeSet) {
-    // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
-    // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
-    // returnEdgeSet.add(edge);
-    // }
-    // }
-    // return returnEdgeSet;
-    // }
-
     /**
      * Checks that the rep invariant holds
      */
@@ -371,6 +425,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
             // check edges
             for (Edge e : this.edgeSet) {
                 assert (e != null) : "Null edge";
+                assert (vertexSet.contains(e.v1)) : "Vertex 1 not in graph";
+                assert (vertexSet.contains(e.v2)) : "Vertex 2 not in graph";
             }
         }
     }
