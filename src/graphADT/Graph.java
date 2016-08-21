@@ -68,8 +68,7 @@ public interface Graph<V, E> {
     /**
      * Returns <code>true</code> if this graph contains the specified edge
      * value. Formally, returns <code>true</code> iff this graph contains edge
-     * <code>e2</code> s.t. <code>e2.equals(e)</code>. If edge <code>e</code> is
-     * <code>null</code>, return <code>false</code>.
+     * <code>e2</code> s.t. <code>e2.equals(e)</code>.
      * 
      * @param e - edge to test if contained in this graph
      * @return <code>true</code> iff this graph contains edge <code>e</code>,
@@ -102,7 +101,7 @@ public interface Graph<V, E> {
      * 
      * @return a set view of all the vertices contained in this graph
      */
-    Set<? extends V> vertexSet();
+    Set<V> vertexSet();
 
     /**
      * Returns a Set view of the edges contained in this graph. The set is
@@ -112,16 +111,13 @@ public interface Graph<V, E> {
      * 
      * @return a set view of all the edges contained in this graph
      */
-    Set<? extends E> edgeSet();
+    Set<E> edgeSet();
 
     /**
-     * Returns a Set view of the edges touching the specified vertex
-     * <code>v</code>. The set is backed by the graph, so changes to the graph
-     * are reflected in the set, and vice-versa. If the graph is modified while
-     * an iteration over the set is in progress, the results of the iteration
-     * are undefined. If no edges touch <code>v</code>, then an empty set is
-     * returned. If <code>v</code> is not a part of this graph, then
-     * <code>null</code> is returned.
+     * Returns a set of the edges touching the specified vertex <code>v</code>.
+     * If no edges touch <code>v</code>, then an empty set is returned. If
+     * <code>v</code> is not a part of this graph, then <code>null</code> is
+     * returned.
      * 
      * @param v - the vertex for which a set of connected edges is returned
      * @return a set of all edges touching the specified vertex <code>v</code>,
@@ -129,10 +125,10 @@ public interface Graph<V, E> {
      * @throws NullPointerException if vertex <code>v</code> is
      *             <code>null</code>
      */
-    Set<? extends E> edgeSet(V v) throws NullPointerException;
+    Set<E> edgeSet(V v) throws NullPointerException;
 
     /**
-     * Returns a Set view of the edges connecting the specified vertices
+     * Returns a set of the edges connecting the specified vertices
      * <code>v1</code> and <code>v2</code>. If vertices <code>v1</code> and
      * <code>v2</code> are not connected, then an empty set is returned. If
      * either <code>v1</code> or <code>v2</code> are not contained in this
@@ -146,7 +142,7 @@ public interface Graph<V, E> {
      * @throws NullPointerException if vertex values <code>v1</code> or
      *             <code>v2</code> are <code>null</code>
      */
-    Set<? extends E> edgeSet(V v1, V v2) throws NullPointerException;
+    Set<E> edgeSet(V v1, V v2) throws NullPointerException;
 
     /**
      * Returns an edge connecting the specified vertex values. If vertices
