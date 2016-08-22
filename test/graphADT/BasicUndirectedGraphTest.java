@@ -1,9 +1,12 @@
 package graphADT;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
@@ -44,6 +47,9 @@ public class BasicUndirectedGraphTest {
     @Test
     public void constructor() {
         // setup run before test which constructed new graphs
+        assertTrue(testGraphStringStringNull.vertexSet().isEmpty());
+        assertTrue(testGraphStringStringNull.edgeSet().isEmpty());
+
         assertTrue(testGraphStringString.vertexSet().isEmpty());
         assertTrue(testGraphStringString.edgeSet().isEmpty());
 
@@ -63,8 +69,11 @@ public class BasicUndirectedGraphTest {
          * Add vertices
          */
         // String into String type vertex
-        for (String s : strings) {
-            assertTrue(testGraphStringString.addVertex(s));
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertTrue(testGraphStringStringNull.addVertex(strings[i]));
+            assertTrue(testGraphStringString.addVertex(strings[i]));
+            assertTrue(testGraphStringDouble.addVertex(strings[i]));
+            assertTrue(testGraphIntegerInteger.addVertex(integers[i]));
         }
 
         // try graph of more complex objects
@@ -76,7 +85,12 @@ public class BasicUndirectedGraphTest {
         /*
          * Add duplicate vertices
          */
-        assertFalse(testGraphStringString.addVertex(strings[0]));
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(testGraphStringStringNull.addVertex(strings[i]));
+            assertFalse(testGraphStringString.addVertex(strings[i]));
+            assertFalse(testGraphStringDouble.addVertex(strings[i]));
+            assertFalse(testGraphIntegerInteger.addVertex(integers[i]));
+        }
         assertFalse(complexObjectGraph.addVertex(co));
 
         /*
@@ -92,14 +106,14 @@ public class BasicUndirectedGraphTest {
             testGraphStringString.addVertex(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
 
         try {
             complexObjectGraph.addVertex(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
 
     }
@@ -117,31 +131,15 @@ public class BasicUndirectedGraphTest {
             assertTrue(testGraphStringStringNull.addEdge(strings[i % 3],
                     strings[(i + 1) % 3]));
 
-            assertTrue(testGraphStringStringNull.containsEdge(strings[i % 3],
-                    strings[(i + 1) % 3]));
-            System.out.println(strings[i % 3] + " - " + strings[(i + 1) % 3]
-                    + ": " + testGraphStringStringNull.getEdge(strings[i % 3],
-                            strings[(i + 1) % 3]));
-
             assertTrue(testGraphStringString.addEdge(strings[i % 3],
                     strings[(i + 1) % 3],
                     strings[i % 3] + "-" + strings[(i + 1) % 3]));
 
-            System.out.println(strings[i % 3] + " - " + strings[(i + 1) % 3]
-                    + ": " + testGraphStringString.getEdge(strings[i % 3],
-                            strings[(i + 1) % 3]));
-
             assertTrue(testGraphStringDouble.addEdge(strings[i % 3],
                     strings[(i + 1) % 3], doubles[i]));
 
-            System.out.println(doubles[i % 3] + " - " + doubles[(i + 1) % 3] + ": " + testGraphStringDouble
-                    .getEdge(strings[i % 3], strings[(i + 1) % 3]));
-
             assertTrue(testGraphIntegerInteger.addEdge(integers[i % 3],
                     integers[(i + 1) % 3], integers[i]));
-
-            System.out.println(integers[i % 3] + " - " + integers[(i + 1) % 3] + ": " + testGraphIntegerInteger
-                    .getEdge(integers[i % 3], integers[(i + 1) % 3]));
         }
 
         /*
@@ -162,8 +160,10 @@ public class BasicUndirectedGraphTest {
         }
 
         /*
-         * Add duplicate edge adds a duplicate edge already present in graph and
-         * asserts addition was unsuccessful
+         * Add duplicate edge
+         * 
+         * adds a duplicate edge already present in graph and asserts addition
+         * was unsuccessful
          * 
          * This will test internal edge implementation (hashcode, equals)
          */
@@ -193,8 +193,10 @@ public class BasicUndirectedGraphTest {
         }
 
         /*
-         * Add edge with null vertex adds an edge where vertex 1 or 2 or both
-         * are null these should throw NullPointerExceptions
+         * Add edge with null vertex
+         * 
+         * adds an edge where vertex 1 or 2 or both are null these should throw
+         * NullPointerExceptions
          */
         clearGraph(); // clear and reload vertices
         loadVertices();
@@ -202,19 +204,19 @@ public class BasicUndirectedGraphTest {
             testGraphStringString.addEdge(strings[0], null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
         try {
             testGraphStringString.addEdge(null, strings[0]);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
         try {
             testGraphStringString.addEdge(null, null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
 
         /*
@@ -232,7 +234,17 @@ public class BasicUndirectedGraphTest {
     @Test
     public void containsVertex() {
         /*
-         * Test positive containment
+         * Test negative vertex containment in new unloaded graph
+         */
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(testGraphStringStringNull.containsVertex(strings[i]));
+            assertFalse(testGraphStringString.containsVertex(strings[i]));
+            assertFalse(testGraphStringDouble.containsVertex(strings[i]));
+            assertFalse(testGraphIntegerInteger.containsVertex(integers[i]));
+        }
+
+        /*
+         * Test positive vertex containment in loaded graph
          */
         loadVertices();
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
@@ -243,7 +255,7 @@ public class BasicUndirectedGraphTest {
         }
 
         /*
-         * Test negative containment
+         * Test negative vertex containment in loaded graph
          */
         assertFalse(testGraphStringStringNull.containsVertex("four"));
         assertFalse(testGraphStringString.containsVertex("four"));
@@ -264,11 +276,22 @@ public class BasicUndirectedGraphTest {
      */
     @Test
     public void containsEdge() {
-        loadGraphData();
+        ///// TESTING containsEdge(e) /////
+        /*
+         * Test negative edge containment in new unloaded graph
+         */
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(testGraphStringStringNull.containsEdge(null));
+            assertFalse(testGraphStringString
+                    .containsEdge(strings[i % 3] + "-" + strings[(i + 1) % 3]));
+            assertFalse(testGraphStringDouble.containsEdge(doubles[i]));
+            assertFalse(testGraphIntegerInteger.containsEdge(integers[i]));
+        }
 
         /*
-         * Test positive edge value containment
+         * Test positive edge value containment for loaded graph
          */
+        loadGraphData();
         assertTrue(testGraphStringStringNull.containsEdge(null));
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
             assertTrue(testGraphStringString
@@ -278,7 +301,7 @@ public class BasicUndirectedGraphTest {
         }
 
         /*
-         * Test negative edge value containment
+         * Test negative edge value containment for loaded graph
          */
         assertFalse(testGraphStringStringNull.containsEdge(strings[0]));
         assertFalse(testGraphStringString.containsEdge("four"));
@@ -292,9 +315,38 @@ public class BasicUndirectedGraphTest {
         assertFalse(testGraphStringDouble.containsEdge(null));
         assertFalse(testGraphIntegerInteger.containsEdge(null));
 
+        ///// TESTING containsEdge(e) /////
         /*
-         * Test positive edge (v1//v2, v2//v1) containment
+         * Test negative edge (v1//v2, v2//v1) containment in new graph
          */
+        clearGraph();
+        loadVertices();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(testGraphStringStringNull.containsEdge(strings[i % 3],
+                    strings[(i + 1) % 3]));
+            assertFalse(testGraphStringStringNull
+                    .containsEdge(strings[(i + 1) % 3], strings[i % 3]));
+
+            assertFalse(testGraphStringString.containsEdge(strings[i % 3],
+                    strings[(i + 1) % 3]));
+            assertFalse(testGraphStringString.containsEdge(strings[(i + 1) % 3],
+                    strings[i % 3]));
+
+            assertFalse(testGraphStringDouble.containsEdge(strings[i % 3],
+                    strings[(i + 1) % 3]));
+            assertFalse(testGraphStringDouble.containsEdge(strings[(i + 1) % 3],
+                    strings[i % 3]));
+
+            assertFalse(testGraphIntegerInteger.containsEdge(integers[i % 3],
+                    integers[(i + 1) % 3]));
+            assertFalse(testGraphIntegerInteger
+                    .containsEdge(integers[(i + 1) % 3], integers[i % 3]));
+        }
+
+        /*
+         * Test positive edge (v1//v2, v2//v1) containment in loaded graph
+         */
+        reloadGraphData();
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
             assertTrue(testGraphStringStringNull.containsEdge(strings[i % 3],
                     strings[(i + 1) % 3]));
@@ -326,77 +378,88 @@ public class BasicUndirectedGraphTest {
          */
         testGraphStringStringNull.addVertex("four");
         testGraphStringStringNull.addVertex("five");
-        assertFalse(testGraphStringStringNull.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringStringNull.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringStringNull.containsEdge("four", "five"));
-        assertFalse(testGraphStringStringNull.containsEdge("five", "four"));
-
         testGraphStringString.addVertex("four");
         testGraphStringString.addVertex("five");
-        assertFalse(testGraphStringString.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringString.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringString.containsEdge("four", "five"));
-        assertFalse(testGraphStringString.containsEdge("five", "four"));
-
         testGraphStringDouble.addVertex("four");
         testGraphStringDouble.addVertex("five");
-        assertFalse(testGraphStringDouble.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringDouble.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringDouble.containsEdge("four", "five"));
-        assertFalse(testGraphStringDouble.containsEdge("five", "four"));
-
         testGraphIntegerInteger.addVertex(4);
         testGraphIntegerInteger.addVertex(5);
-        assertFalse(testGraphIntegerInteger.containsEdge(integers[2], 4));
-        assertFalse(testGraphIntegerInteger.containsEdge(4, integers[2]));
-        assertFalse(testGraphIntegerInteger.containsEdge(4, 5));
-        assertFalse(testGraphIntegerInteger.containsEdge(5, 4));
+
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(
+                    testGraphStringStringNull.containsEdge(strings[i], "four"));
+            assertFalse(
+                    testGraphStringStringNull.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringStringNull.containsEdge("four", "five"));
+            assertFalse(testGraphStringStringNull.containsEdge("five", "four"));
+
+            assertFalse(testGraphStringString.containsEdge(strings[i], "four"));
+            assertFalse(testGraphStringString.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringString.containsEdge("four", "five"));
+            assertFalse(testGraphStringString.containsEdge("five", "four"));
+
+            assertFalse(testGraphStringDouble.containsEdge(strings[i], "four"));
+            assertFalse(testGraphStringDouble.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringDouble.containsEdge("four", "five"));
+            assertFalse(testGraphStringDouble.containsEdge("five", "four"));
+
+            assertFalse(testGraphIntegerInteger.containsEdge(integers[i], 4));
+            assertFalse(testGraphIntegerInteger.containsEdge(4, integers[i]));
+            assertFalse(testGraphIntegerInteger.containsEdge(4, 5));
+            assertFalse(testGraphIntegerInteger.containsEdge(5, 4));
+        }
 
         /*
          * Test negative edge (v1, v2) containment where either v1, v2, or both
          * aren't in the graph
          */
         reloadGraphData();
-        assertFalse(testGraphStringStringNull.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringStringNull.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringStringNull.containsEdge("four", "five"));
-        assertFalse(testGraphStringStringNull.containsEdge("five", "four"));
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(
+                    testGraphStringStringNull.containsEdge(strings[i], "four"));
+            assertFalse(
+                    testGraphStringStringNull.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringStringNull.containsEdge("four", "five"));
+            assertFalse(testGraphStringStringNull.containsEdge("five", "four"));
 
-        assertFalse(testGraphStringString.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringString.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringString.containsEdge("four", "five"));
-        assertFalse(testGraphStringString.containsEdge("five", "four"));
+            assertFalse(testGraphStringString.containsEdge(strings[i], "four"));
+            assertFalse(testGraphStringString.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringString.containsEdge("four", "five"));
+            assertFalse(testGraphStringString.containsEdge("five", "four"));
 
-        assertFalse(testGraphStringDouble.containsEdge(strings[2], "four"));
-        assertFalse(testGraphStringDouble.containsEdge("four", strings[2]));
-        assertFalse(testGraphStringDouble.containsEdge("four", "five"));
-        assertFalse(testGraphStringDouble.containsEdge("five", "four"));
+            assertFalse(testGraphStringDouble.containsEdge(strings[i], "four"));
+            assertFalse(testGraphStringDouble.containsEdge("four", strings[i]));
+            assertFalse(testGraphStringDouble.containsEdge("four", "five"));
+            assertFalse(testGraphStringDouble.containsEdge("five", "four"));
 
-        assertFalse(testGraphIntegerInteger.containsEdge(integers[2], 4));
-        assertFalse(testGraphIntegerInteger.containsEdge(4, integers[2]));
-        assertFalse(testGraphIntegerInteger.containsEdge(4, 5));
-        assertFalse(testGraphIntegerInteger.containsEdge(5, 4));
+            assertFalse(testGraphIntegerInteger.containsEdge(integers[i], 4));
+            assertFalse(testGraphIntegerInteger.containsEdge(4, integers[i]));
+            assertFalse(testGraphIntegerInteger.containsEdge(4, 5));
+            assertFalse(testGraphIntegerInteger.containsEdge(5, 4));
+        }
 
         /*
          * Test NullPointerException thrown when vertex v1, v2, or both are null
          */
-        try {
-            testGraphStringString.containsEdge(strings[2], null);
-            fail("Expected NullPointerException!");
-        } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
-        }
-        try {
-            testGraphStringString.containsEdge(null, strings[2]);
-            fail("Expected NullPointerException!");
-        } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            try {
+                testGraphStringString.containsEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringString.containsEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
         }
         try {
             testGraphStringString.containsEdge(null, null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
     }
 
@@ -417,21 +480,21 @@ public class BasicUndirectedGraphTest {
          * Test positive vertex containment from loaded graphs
          */
         loadVertices();
-        assertEquals(testGraphStringStringNull.vertexSet().size(),
-                strings.length);
+        assertEquals(strings.length,
+                testGraphStringStringNull.vertexSet().size());
         assertTrue(testGraphStringStringNull.vertexSet()
                 .containsAll(Arrays.asList(strings)));
 
-        assertEquals(testGraphStringString.vertexSet().size(), strings.length);
+        assertEquals(strings.length, testGraphStringString.vertexSet().size());
         assertTrue(testGraphStringString.vertexSet()
                 .containsAll(Arrays.asList(strings)));
 
-        assertEquals(testGraphStringDouble.vertexSet().size(), strings.length);
+        assertEquals(strings.length, testGraphStringDouble.vertexSet().size());
         assertTrue(testGraphStringDouble.vertexSet()
                 .containsAll(Arrays.asList(strings)));
 
-        assertEquals(testGraphIntegerInteger.vertexSet().size(),
-                integers.length);
+        assertEquals(strings.length,
+                testGraphIntegerInteger.vertexSet().size());
         assertTrue(testGraphIntegerInteger.vertexSet()
                 .containsAll(Arrays.asList(integers)));
 
@@ -444,40 +507,28 @@ public class BasicUndirectedGraphTest {
         assertFalse(testGraphIntegerInteger.vertexSet().contains(4));
 
         /*
-         * Test mutability of vertex set of graph
+         * Test immutability of vertex set of graph
          * 
-         * (1) Test by removing a vertex from the vertex set and check that it
-         * effected the underlying graph.
+         * (1) Test by removing a vertex from the vertex set and check that the
+         * underlying graph is unaffected.
          * 
-         * (2) Test by removing/adding vertex from/to the graph and check that
-         * it effected the vertex set.
-         * 
-         * (3) Test removing collection from vertex set and check the change
-         * effects the underlying graph.
+         * (2) Test removing collection from vertex set and check that the
+         * underlying graph is unaffected.
          */
         Set<String> vSet;
 
         // (1)
         vSet = testGraphStringString.vertexSet();
         vSet.remove(strings[2]);
-        assertFalse(testGraphStringString.containsVertex(strings[2]));
+        assertTrue(testGraphStringString.containsVertex(strings[2]));
 
         // (2)
         clearGraph();
         loadVertices();
         vSet = testGraphStringString.vertexSet();
-        testGraphStringString.removeVertex(strings[2]);
-        assertFalse(vSet.contains(strings[2]));
-        testGraphStringString.addVertex(strings[2]);
-        assertTrue(vSet.contains(strings[2]));
-
-        // (3)
-        clearGraph();
-        loadVertices();
-        vSet = testGraphStringString.vertexSet();
         vSet.removeAll(Arrays.asList(strings));
         for (String s : strings) {
-            assertFalse(testGraphStringString.containsVertex(s));
+            assertTrue(testGraphStringString.containsVertex(s));
         }
     }
 
@@ -487,7 +538,6 @@ public class BasicUndirectedGraphTest {
     @Test
     public void edgeSet() {
         ///// TESTING edgeSet() /////
-
         /*
          * Test new empty graphs
          */
@@ -500,12 +550,12 @@ public class BasicUndirectedGraphTest {
          * Test positive edge containment from loaded graphs
          */
         loadGraphData();
-        assertEquals(testGraphStringStringNull.edgeSet().size(), 1);
-        assertTrue(testGraphStringStringNull.edgeSet().contains(null));
+        assertEquals(1, testGraphStringStringNull.edgeSet().size());
+        assertEquals(strings.length, testGraphStringString.edgeSet().size());
+        assertEquals(strings.length, testGraphStringDouble.edgeSet().size());
+        assertEquals(strings.length, testGraphIntegerInteger.edgeSet().size());
 
-        assertEquals(testGraphStringString.edgeSet().size(), strings.length);
-        assertEquals(testGraphStringDouble.edgeSet().size(), strings.length);
-        assertEquals(testGraphIntegerInteger.edgeSet().size(), integers.length);
+        assertTrue(testGraphStringStringNull.edgeSet().contains(null));
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
             assertTrue(testGraphStringString.edgeSet()
                     .contains(strings[i % 3] + "-" + strings[(i + 1) % 3]));
@@ -516,48 +566,37 @@ public class BasicUndirectedGraphTest {
         /*
          * Test negative edge containment from loaded graphs
          */
+        reloadGraphData();
         assertFalse(testGraphStringStringNull.edgeSet().contains("four"));
         assertFalse(testGraphStringString.edgeSet().contains("four"));
         assertFalse(testGraphStringDouble.edgeSet().contains(4d));
         assertFalse(testGraphIntegerInteger.edgeSet().contains(4));
 
         /*
-         * Test mutability of edge set of graph
+         * Test immutability of edge set of graph
          * 
-         * (1) Test by removing an edge from the edge set and check that it
-         * effected the underlying graph.
+         * (1) Test by removing an edge from the edge set and check that the
+         * underlying graph is unaffected.
          * 
-         * (2) Test by removing/adding edge from/to the graph and check that it
-         * effected the edge set.
-         * 
-         * (3) Test removing collection from edge set and check the change
-         * effects the underlying graph.
+         * (2) Test removing collection from edge set and check that the
+         * underlying graph is unaffected.
          */
         Set<Double> eSet;
 
         // (1)
         eSet = testGraphStringDouble.edgeSet();
         eSet.remove(doubles[2]);
-        assertFalse(testGraphStringDouble.containsEdge(doubles[2]));
+        assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
 
         // (2)
         reloadGraphData();
         eSet = testGraphStringDouble.edgeSet();
-        testGraphStringDouble.removeEdge(doubles[0]);
-        assertFalse(eSet.contains(doubles[0]));
-        testGraphStringDouble.addEdge(strings[0], strings[1], doubles[0]);
-        assertTrue(eSet.contains(doubles[0]));
-
-        // (3)
-        reloadGraphData();
-        eSet = testGraphStringDouble.edgeSet();
         eSet.removeAll(Arrays.asList(doubles));
         for (Double d : doubles) {
-            assertFalse(testGraphStringDouble.containsEdge(d));
+            assertTrue(testGraphStringDouble.containsEdge(d));
         }
 
         ///// TESTING edgeSet(v) /////
-
         /*
          * Test edge containment from a vertex of new graph
          */
@@ -575,25 +614,25 @@ public class BasicUndirectedGraphTest {
          */
         reloadGraphData();
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
-            assertEquals(testGraphStringStringNull.edgeSet(strings[i]).size(),
-                    1);
+            assertEquals(1,
+                    testGraphStringStringNull.edgeSet(strings[i]).size());
             assertTrue(testGraphStringStringNull.edgeSet(strings[i])
                     .contains(null));
 
-            assertEquals(testGraphStringString.edgeSet(strings[i]).size(), 2);
+            assertEquals(2, testGraphStringString.edgeSet(strings[i]).size());
             assertTrue(testGraphStringString.edgeSet(strings[i])
                     .contains(strings[i % 3] + "-" + strings[(i + 1) % 3]));
             assertTrue(testGraphStringString.edgeSet(strings[i])
                     .contains(strings[(i + 2) % 3] + "-" + strings[i % 3]));
 
-            assertEquals(testGraphStringDouble.edgeSet(strings[i]).size(), 2);
+            assertEquals(2, testGraphStringDouble.edgeSet(strings[i]).size());
             assertTrue(testGraphStringDouble.edgeSet(strings[i])
                     .contains(doubles[i % 3]));
             assertTrue(testGraphStringDouble.edgeSet(strings[i])
                     .contains(doubles[(i + 2) % 3]));
 
-            assertEquals(testGraphIntegerInteger.edgeSet(integers[i]).size(),
-                    2);
+            assertEquals(2,
+                    testGraphIntegerInteger.edgeSet(integers[i]).size());
             assertTrue(testGraphIntegerInteger.edgeSet(integers[i])
                     .contains(integers[i % 3]));
             assertTrue(testGraphIntegerInteger.edgeSet(integers[i])
@@ -603,6 +642,7 @@ public class BasicUndirectedGraphTest {
         /*
          * Test negative edge containment from a vertex not loaded in graph
          */
+        reloadGraphData();
         assertNull(testGraphStringStringNull.edgeSet("four"));
         assertNull(testGraphStringString.edgeSet("four"));
         assertNull(testGraphStringDouble.edgeSet("four"));
@@ -612,29 +652,30 @@ public class BasicUndirectedGraphTest {
          * Test NullPointerException thrown if trying to get edge set of a null
          * vertex
          */
+        reloadGraphData();
         try {
             testGraphStringStringNull.edgeSet(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
         try {
             testGraphStringString.edgeSet(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
         try {
             testGraphStringDouble.edgeSet(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
         try {
-            testGraphStringDouble.edgeSet(null);
+            testGraphIntegerInteger.edgeSet(null);
             fail("Expected NullPointerException!");
         } catch (NullPointerException npe) {
-            assertEquals(npe.getMessage(), "Vertex value null");
+            assertEquals("Vertex value null", npe.getMessage());
         }
 
         /*
@@ -644,6 +685,7 @@ public class BasicUndirectedGraphTest {
          * connected, we need to add a few more to each to ensure unconnected
          * vertices exist in graph in order to test properly.
          */
+        reloadGraphData();
         testGraphStringStringNull.addVertex("four");
         assertTrue(testGraphStringStringNull.edgeSet("four").isEmpty());
 
@@ -655,9 +697,31 @@ public class BasicUndirectedGraphTest {
 
         testGraphIntegerInteger.addVertex(4);
         assertTrue(testGraphIntegerInteger.edgeSet(4).isEmpty());
+        
+        /*
+         * Test immutability of edge set of graph
+         * 
+         * (1) Test by removing an edge from the edge set and check that the
+         * underlying graph is unaffected.
+         * 
+         * (2) Test removing collection from edge set and check that the
+         * underlying graph is unaffected.
+         */
+
+        // (1)
+        eSet = testGraphStringDouble.edgeSet(strings[2]);
+        eSet.remove(doubles[2]);
+        assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
+
+        // (2)
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[2]);
+        eSet.removeAll(Arrays.asList(doubles));
+        for (Double d : doubles) {
+            assertTrue(testGraphStringDouble.containsEdge(d));
+        }
 
         ///// TESTING edgeSet(v1, v2) /////
-
         /*
          * Test edge containment from two vertices in new graph
          */
@@ -678,52 +742,419 @@ public class BasicUndirectedGraphTest {
          * Test positive edge containment from two vertices in a loaded graph
          */
         reloadGraphData();
-        // System.out.println("Whole set: " +
-        // testGraphStringStringNull.edgeSet());
-        // System.out.println(
-        // "one set: " + testGraphStringStringNull.edgeSet(strings[0]));
-        // System.out.println(
-        // "two set: " + testGraphStringStringNull.edgeSet(strings[1]));
-        // System.out.println(
-        // "three set: " + testGraphStringStringNull.edgeSet(strings[2]));
-        // System.out.println("one-two set: "
-        // + testGraphStringStringNull.edgeSet(strings[0], strings[1]));
-        // System.out.println("two-three set: "
-        // + testGraphStringStringNull.edgeSet(strings[1], strings[2]));
-        // System.out.println("one-three set: "
-        // + testGraphStringStringNull.edgeSet(strings[0], strings[2]));
         for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
-            // System.out.println(testGraphStringStringNull.edgeSet(strings[i %
-            // 3],
-            // strings[(i + 1) % 3]));
-            // System.out.println(testGraphStringStringNull
-            // .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size());
-            assertEquals(testGraphStringStringNull
-                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size(), 1);
+            assertEquals(1, testGraphStringStringNull
+                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size());
             assertTrue(testGraphStringStringNull
                     .edgeSet(strings[i % 3], strings[(i + 1) % 3])
                     .contains(null));
 
-            // System.out.println(testGraphStringString
-            // .edgeSet(strings[i % 3], strings[(i + 1) % 3]));
-            assertEquals(testGraphStringString
-                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size(), 1);
+            assertEquals(1, testGraphStringString
+                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size());
             assertTrue(testGraphStringString
                     .edgeSet(strings[i % 3], strings[(i + 1) % 3])
                     .contains(strings[i % 3] + "-" + strings[(i + 1) % 3]));
 
-            assertEquals(testGraphStringDouble
-                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size(), 1);
+            assertEquals(1, testGraphStringDouble
+                    .edgeSet(strings[i % 3], strings[(i + 1) % 3]).size());
             assertTrue(testGraphStringDouble
                     .edgeSet(strings[i % 3], strings[(i + 1) % 3])
                     .contains(doubles[i % 3]));
 
-            assertEquals(testGraphIntegerInteger
-                    .edgeSet(integers[i % 3], integers[(i + 1) % 3]).size(), 1);
+            assertEquals(1, testGraphIntegerInteger
+                    .edgeSet(integers[i % 3], integers[(i + 1) % 3]).size());
             assertTrue(testGraphIntegerInteger
                     .edgeSet(integers[i % 3], integers[(i + 1) % 3])
                     .contains(integers[i % 3]));
         }
+
+        /*
+         * Test negative edge containment from vertex v1, v2, or both not loaded
+         * in graph
+         */
+        reloadGraphData();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertNull(testGraphStringStringNull.edgeSet(strings[i], "four"));
+            assertNull(testGraphStringStringNull.edgeSet("four", strings[i]));
+            assertNull(testGraphStringStringNull.edgeSet("four", "five"));
+
+            assertNull(testGraphStringString.edgeSet(strings[i], "four"));
+            assertNull(testGraphStringString.edgeSet("four", strings[i]));
+            assertNull(testGraphStringString.edgeSet("four", "five"));
+
+            assertNull(testGraphStringDouble.edgeSet(strings[i], "four"));
+            assertNull(testGraphStringDouble.edgeSet("four", strings[i]));
+            assertNull(testGraphStringDouble.edgeSet("four", "five"));
+
+            assertNull(testGraphIntegerInteger.edgeSet(integers[i], 4));
+            assertNull(testGraphIntegerInteger.edgeSet(4, integers[i]));
+            assertNull(testGraphIntegerInteger.edgeSet(4, 5));
+        }
+
+        /*
+         * Test NullPointerException thrown if trying to get edge set of a null
+         * vertex
+         */
+        reloadGraphData();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            try {
+                testGraphStringStringNull.edgeSet(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringStringNull.edgeSet(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringString.edgeSet(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringString.edgeSet(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringDouble.edgeSet(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringDouble.edgeSet(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphIntegerInteger.edgeSet(integers[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphIntegerInteger.edgeSet(null, integers[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+        }
+        try {
+            testGraphStringStringNull.edgeSet(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringString.edgeSet(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringDouble.edgeSet(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphIntegerInteger.edgeSet(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+
+        /*
+         * Test negative edge (v1, v2) containment with v1 and v2 in the graph
+         * 
+         * Since test graphs all only contain 3 vertices and are thus fully
+         * connected, we need to add a few more to each to ensure unconnected
+         * vertices exist in graph in order to test properly.
+         */
+        reloadGraphData();
+        testGraphStringStringNull.addVertex("four");
+        testGraphStringString.addVertex("four");
+        testGraphStringDouble.addVertex("four");
+        testGraphIntegerInteger.addVertex(4);
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertTrue(testGraphStringStringNull.edgeSet(strings[i], "four")
+                    .isEmpty());
+            assertTrue(testGraphStringStringNull.edgeSet("four", strings[i])
+                    .isEmpty());
+
+            assertTrue(testGraphStringString.edgeSet(strings[i], "four")
+                    .isEmpty());
+            assertTrue(testGraphStringString.edgeSet("four", strings[i])
+                    .isEmpty());
+
+            assertTrue(testGraphStringDouble.edgeSet(strings[i], "four")
+                    .isEmpty());
+            assertTrue(testGraphStringDouble.edgeSet("four", strings[i])
+                    .isEmpty());
+
+            assertTrue(
+                    testGraphIntegerInteger.edgeSet(integers[i], 4).isEmpty());
+            assertTrue(
+                    testGraphIntegerInteger.edgeSet(4, integers[i]).isEmpty());
+        }
+        
+        /*
+         * Test immutability of edge set of graph
+         * 
+         * (1) Test by removing an edge from the edge set and check that the
+         * underlying graph is unaffected.
+         * 
+         * (2) Test removing collection from edge set and check that the
+         * underlying graph is unaffected.
+         */
+
+        // (1)
+        eSet = testGraphStringDouble.edgeSet(strings[0], strings[2]);
+        eSet.remove(doubles[2]);
+        assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
+
+        // (2)
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[0], strings[2]);
+        eSet.removeAll(Arrays.asList(doubles));
+        for (Double d : doubles) {
+            assertTrue(testGraphStringDouble.containsEdge(d));
+        }
+    }
+
+    /**
+     * Unit tests for get edge from graph
+     */
+    @Test
+    public void getEdge() {
+        /*
+         * Test new empty graphs
+         */
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            for (int j = 0; j <= 2; j++) { // j = {0, 1, 2}
+                assertNull(testGraphStringStringNull.getEdge(strings[i],
+                        strings[j]));
+                assertNull(
+                        testGraphStringString.getEdge(strings[i], strings[j]));
+                assertNull(
+                        testGraphStringDouble.getEdge(strings[i], strings[j]));
+                assertNull(testGraphIntegerInteger.getEdge(integers[i],
+                        integers[j]));
+            }
+        }
+
+        /*
+         * Test new vertex only loaded graph
+         */
+        loadVertices();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            for (int j = 0; j <= 2; j++) { // j = {0, 1, 2}
+                assertNull(testGraphStringStringNull.getEdge(strings[i],
+                        strings[j]));
+                assertNull(
+                        testGraphStringString.getEdge(strings[i], strings[j]));
+                assertNull(
+                        testGraphStringDouble.getEdge(strings[i], strings[j]));
+                assertNull(testGraphIntegerInteger.getEdge(integers[i],
+                        integers[j]));
+            }
+        }
+
+        /*
+         * Test positive edge value in new loaded graph
+         */
+        loadEdges();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertEquals(null, testGraphStringStringNull.getEdge(strings[i % 3],
+                    strings[(i + 1) % 3]));
+            assertEquals(strings[i % 3] + "-" + strings[(i + 1) % 3],
+                    testGraphStringString.getEdge(strings[i % 3],
+                            strings[(i + 1) % 3]));
+            assertEquals(doubles[i], testGraphStringDouble
+                    .getEdge(strings[i % 3], strings[(i + 1) % 3]));
+            assertEquals(integers[i], testGraphIntegerInteger
+                    .getEdge(integers[i % 3], integers[(i + 1) % 3]));
+        }
+
+        /*
+         * Test negative edge value in loaded graph
+         * 
+         * Since test graphs all only contain 3 vertices and are thus fully
+         * connected, we need to add a few more to each to ensure unconnected
+         * vertices exist in graph in order to test properly.
+         */
+        reloadGraphData();
+        testGraphStringStringNull.addVertex("four");
+        testGraphStringStringNull.addVertex("five");
+        testGraphStringString.addVertex("four");
+        testGraphStringString.addVertex("five");
+        testGraphStringDouble.addVertex("four");
+        testGraphStringDouble.addVertex("five");
+        testGraphIntegerInteger.addVertex(4);
+        testGraphIntegerInteger.addVertex(5);
+
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertNull(testGraphStringStringNull.getEdge(strings[i], "four"));
+            assertNull(testGraphStringStringNull.getEdge("four", strings[i]));
+            assertNull(testGraphStringStringNull.getEdge("four", "five"));
+
+            assertNull(testGraphStringString.getEdge(strings[i], "four"));
+            assertNull(testGraphStringString.getEdge("four", strings[i]));
+            assertNull(testGraphStringString.getEdge("four", "five"));
+
+            assertNull(testGraphStringDouble.getEdge(strings[i], "four"));
+            assertNull(testGraphStringDouble.getEdge("four", strings[i]));
+            assertNull(testGraphStringDouble.getEdge("four", "five"));
+
+            assertNull(testGraphIntegerInteger.getEdge(integers[i], 4));
+            assertNull(testGraphIntegerInteger.getEdge(4, integers[i]));
+            assertNull(testGraphIntegerInteger.getEdge(4, 5));
+        }
+
+        /*
+         * Test NullPointerException thrown if trying to get edge set of a null
+         * vertex
+         */
+        reloadGraphData();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            try {
+                testGraphStringStringNull.getEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringStringNull.getEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringString.getEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringString.getEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringDouble.getEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringDouble.getEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphIntegerInteger.getEdge(integers[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphIntegerInteger.getEdge(null, integers[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+        }
+        try {
+            testGraphStringStringNull.getEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringString.getEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringDouble.getEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphIntegerInteger.getEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+
+    }
+    
+    /**
+     * Tests removing all edges from graph functionality
+     */
+    @Test
+    public void removeAllEdges() {
+        ///// TESTING removeAllEdges(Collection) /////
+        /*
+         * Remove collection from new empty graph
+         */
+        assertFalse(testGraphStringStringNull.removeAllEdges(Arrays.asList(strings)));
+        assertFalse(testGraphStringString.removeAllEdges(Arrays.asList(strings)));
+        assertFalse(testGraphStringDouble.removeAllEdges(Arrays.asList(doubles)));
+        assertFalse(testGraphIntegerInteger.removeAllEdges(Arrays.asList(integers)));
+        
+        /*
+         * Remove full collection from loaded graph
+         */
+        reloadGraphData();
+        assertTrue(testGraphStringStringNull.removeAllEdges(testGraphStringStringNull.edgeSet()));
+        assertTrue(testGraphStringStringNull.edgeSet().isEmpty());
+        assertTrue(testGraphStringString.removeAllEdges(testGraphStringString.edgeSet()));
+        assertTrue(testGraphStringString.edgeSet().isEmpty());
+        assertTrue(testGraphStringDouble.removeAllEdges(testGraphStringDouble.edgeSet()));
+        assertTrue(testGraphStringDouble.edgeSet().isEmpty());
+        assertTrue(testGraphIntegerInteger.removeAllEdges(testGraphIntegerInteger.edgeSet()));
+        assertTrue(testGraphIntegerInteger.edgeSet().isEmpty());
+        
+        /*
+         * Remove partial collection from loaded graph
+         */
+        reloadGraphData();
+        Set<String> removeStringSet = testGraphStringStringNull.edgeSet(strings[0]);
+        assertTrue(testGraphStringStringNull.removeAllEdges(removeStringSet));
+        assertFalse(testGraphStringStringNull.edgeSet().containsAll(removeStringSet));
+        
+        removeStringSet = testGraphStringString.edgeSet(strings[0]);
+        assertTrue(testGraphStringString.removeAllEdges(removeStringSet));
+        assertFalse(testGraphStringString.edgeSet().containsAll(removeStringSet));
+        
+        Set<Double> removeDoubleSet = testGraphStringDouble.edgeSet(strings[0]);
+        assertTrue(testGraphStringDouble.removeAllEdges(removeDoubleSet));
+        assertFalse(testGraphStringDouble.edgeSet().containsAll(removeDoubleSet));
+        
+        Set<Integer> removeIntSet = testGraphIntegerInteger.edgeSet(integers[0]);
+        assertTrue(testGraphIntegerInteger.removeAllEdges(removeIntSet));
+        assertFalse(testGraphIntegerInteger.edgeSet().containsAll(removeIntSet));
+        
+        ///// TESTING removeAllEdges(Collection) /////
+        
     }
 
     /**
@@ -774,9 +1205,6 @@ public class BasicUndirectedGraphTest {
             // String/String/null edge value
             testGraphStringStringNull.addEdge(strings[i % 3],
                     strings[(i + 1) % 3]);
-
-//            System.out.println(testGraphStringStringNull.getEdge(strings[i % 3],
-//                    strings[(i + 1) % 3]));
 
             // String/String
             testGraphStringString.addEdge(strings[i % 3], strings[(i + 1) % 3],

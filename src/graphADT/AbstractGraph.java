@@ -4,16 +4,16 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Graph is a graph storing vertex and edge abstract data types.
+ * AbstractGraph is a graph storing vertex and edge abstract data types.
  * 
- * This is the common interface for any Graph class.
+ * This is the common interface for any AbstractGraph class.
  * 
  * @author Drew Reese
  *
  * @param <V> Data type to store as vertices
  * @param <E> Data type to store as edges
  */
-public interface Graph<V, E> {
+public interface AbstractGraph<V, E> {
 
     /**
      * Adds specified vertex value to this graph if not already present.
@@ -94,20 +94,14 @@ public interface Graph<V, E> {
     boolean containsEdge(V v1, V v2) throws NullPointerException;
 
     /**
-     * Returns a Set view of the vertices contained in this graph. The set is
-     * backed by the graph, so changes to the graph are reflected in the set,
-     * and vice-versa. If the graph is modified while an iteration over the set
-     * is in progress, the results of the iteration are undefined.
+     * Returns a set view of the vertices contained in this graph.
      * 
-     * @return a set view of all the vertices contained in this graph
+     * @return a set of all the vertices contained in this graph
      */
     Set<V> vertexSet();
 
     /**
-     * Returns a Set view of the edges contained in this graph. The set is
-     * backed by the graph, so changes to the graph are reflected in the set,
-     * and vice-versa. If the graph is modified while an iteration over the set
-     * is in progress, the results of the iteration are undefined.
+     * Returns a set view of the edges contained in this graph.
      * 
      * @return a set view of all the edges contained in this graph
      */
@@ -263,8 +257,7 @@ public interface Graph<V, E> {
      * Removes the specified edge e from this graph if it is present. Formally,
      * this method removes edge <code>e2</code> s.t. <code>e2.equals(e)</code>
      * is <code>true</code>. Returns <code>true</code> if graph contained the
-     * specified edge, <code>false</code> otherwise. If edge e is
-     * <code>null</code>, then <code>false</code> is returned.
+     * specified edge, <code>false</code> otherwise.
      * 
      * @param e - the edge to be removed from this graph
      * @return <code>true</code> iff the graph contained the specified edge,
@@ -302,7 +295,7 @@ public interface Graph<V, E> {
     boolean removeVertex(V v);
 
     /*
-     * These sub-interfaces are also overkill as Graph<V,E> can just store
+     * These sub-interfaces are also overkill as AbstractGraph<V,E> can just store
      * vertex and edge objects as well as regular java objects (String, Integer,
      * etc...). These were a nice starting point, but should be moved to
      * external interface classes or into specific graph classes that actually

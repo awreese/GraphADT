@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  */
 
-public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
+public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
     // DEBUGGING EXPENSIVE CHECKREP FLAG
     private static final boolean RUN_CHECKREP = true;
@@ -112,6 +112,14 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
             return BasicUndirectedGraph.this;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "(" + v1 + "<->" + v2 + ")";
+        }
+
     }
 
     /* internal representation of basic undirected graph */
@@ -130,8 +138,6 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     // vertex v2 in vertexSet
 
     public BasicUndirectedGraph() {
-        // this.vertexSet = new HashSet<V>();
-        // this.edgeSet = new HashSet<Edge>();
         this.vertexMap = new HashMap<V,Set<Edge>>();
         this.edgeMap = new HashMap<E,Set<Edge>>();
         checkRep();
@@ -142,10 +148,6 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v == null) {
             throw new NullPointerException("Vertex value null");
         }
-
-        // boolean result = vertexSet.add(v);
-        // checkRep();
-        // return result;
 
         if (vertexMap.containsKey(v)) {
             return false;
@@ -166,9 +168,6 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         }
-        // if (!(vertexSet.contains(v1) && vertexSet.contains(v2))) {
-        // return false;
-        // }
         if (!(containsVertex(v1) && containsVertex(v2))) {
             return false;
         }
@@ -182,35 +181,21 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         }
         Edge newEdge = new Edge(v1, v2, e);
         boolean modified = edgeMap.get(e).add(newEdge);
-        vertexMap.get(v1).add(newEdge);
-        vertexMap.get(v2).add(newEdge);
-
+        if (modified) {
+            vertexMap.get(v1).add(newEdge);
+            vertexMap.get(v2).add(newEdge);
+        }
         checkRep();
         return modified;
     }
 
     @Override
     public boolean containsVertex(V v) {
-        // if (v == null) {
-        // return false;
-        // } else {
-        // return vertexSet.contains(v);
-        // }
         return vertexMap.containsKey(v);
     }
 
     @Override
     public boolean containsEdge(E e) {
-        // if (e == null) {
-        // return false;
-        // } else {
-        // for (Edge edge : edgeSet) {
-        // if (edge.e.equals(e)) {
-        // return true;
-        // }
-        // }
-        // return false;
-        // }
         return edgeMap.containsKey(e);
     }
 
@@ -219,42 +204,17 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         }
-
-        // if both vertexSet in graph, check for edge
-        if (containsVertex(v1) && containsVertex(v2)) {
-            // for (Edge e : edgeSet) {
-            // if ((e.v1.equals(v1) && e.v2.equals(v2))
-            // || (e.v1.equals(v2) && e.v2.equals(v1))) {
-            // return true;
-            // }
-            // }
-            for (Set<Edge> eSet : edgeMap.values()) {
-                for (Edge e : eSet) {
-                    if ((e.v1.equals(v1) && e.v2.equals(v2))
-                            || (e.v1.equals(v2) && e.v2.equals(v1))) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return !edgesBetween(v1, v2).isEmpty();
     }
 
     @Override
     public Set<V> vertexSet() {
-        // return new HashSet<V>(vertexSet);
-        // return vertexSet;
-        return vertexMap.keySet();
+        return new HashSet<V>(vertexMap.keySet());
     }
 
     @Override
     public Set<E> edgeSet() {
-        // Set<E> returnEdgeSet = new HashSet<E>();
-        // for (Edge edge : edgeSet) {
-        // returnEdgeSet.add(edge.e);
-        // }
-        // return returnEdgeSet;
-        return edgeMap.keySet();
+        return new HashSet<E>(edgeMap.keySet());
     }
 
     @Override
@@ -266,11 +226,6 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         }
 
         Set<E> returnEdgeSet = new HashSet<E>();
-        // for (Edge edge : edgeSet) {
-        // if (edge.v1.equals(v) || edge.v2.equals(v)) {
-        // returnEdgeSet.add(edge.e);
-        // }
-        // }
         for (Edge e : vertexMap.get(v)) {
             returnEdgeSet.add(e.e);
         }
@@ -284,43 +239,17 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         } else if (!(containsVertex(v1) && containsVertex(v2))) {
             return null;
         }
-
-        // Set<E> returnEdgeSet = new HashSet<E>();
-        // for (Edge edge : edgeSet) {
-        // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
-        // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
-        // returnEdgeSet.add(edge.e);
-        // }
-        // }
-        // returnEdgeSet.addAll(edgeSet(v1));
-        // returnEdgeSet.addAll(edgeSet(v2));
-        // return returnEdgeSet;
         return edgesBetween(v1, v2);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E getEdge(V v1, V v2) throws NullPointerException {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         } else if (containsVertex(v1) && containsVertex(v2)) {
-            // for (Edge edge : edgeSet) {
-            // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
-            // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
-            // return edge.e;
-            // }
-            // }
-            // Set<Edge> intEdges = vertexMap.get(v1);
-            // intEdges.retainAll(vertexMap.get(v2));
-            // if (!intEdges.isEmpty()) {
-            // E[] intersection = null;
-            // return intEdges.toArray(intersection)[0];
-            // }
             Set<E> edges = edgesBetween(v1, v2);
-//            edges.remove(null);
-//            System.out.println("Edges between " + v1 + " and "
-//                    + v2 + ": " + edges.toString());
             if (!edges.isEmpty()) {
-//                System.out.println(edges.toString());
                 return (E) edges.toArray()[0];
             }
         }
@@ -336,23 +265,9 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         }
 
         boolean modified = false;
-        // Iterator<Edge> edgeItr = this.edgeSet.iterator();
-        // while (edgeItr.hasNext()) {
-        // Edge edge = edgeItr.next();
-        //
-        // for (E edgeToRemove : edges) {
-        // if (edge.e.equals(edgeToRemove)) {
-        // edgeItr.remove();
-        // modified = true;
-        // break;
-        // }
-        // }
-        // }
         for (E e : edges) {
-            Set<Edge> eSet = edgeMap.remove(e);
-            for (Edge edge : eSet) {
-                vertexMap.get(edge.v1).remove(edge);
-                vertexMap.get(edge.v2).remove(edge);
+            if (this.removeEdge(e)) {
+                modified = true;
             }
         }
         checkRep();
@@ -367,23 +282,8 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
             return null;
         }
 
-        // Set<E> removedEdgeSet = new HashSet<E>();
-        // Iterator<Edge> edgeItr = this.edgeSet.iterator();
-        //
-        // while (edgeItr.hasNext()) {
-        // Edge edge = edgeItr.next();
-        //
-        // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
-        // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
-        // removedEdgeSet.add(edge.e);
-        // edgeItr.remove();
-        // }
-        // }
-
         Set<E> removedEdgeSet = edgesBetween(v1, v2);
-
         removeAllEdges(removedEdgeSet);
-
         checkRep();
         return removedEdgeSet;
     }
@@ -424,20 +324,13 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     @Override
     public boolean removeEdge(E e) {
         boolean modified = false;
-        // Iterator<Edge> edgeItr = this.edgeSet.iterator();
-        //
-        // while (edgeItr.hasNext()) {
-        // Edge edge = edgeItr.next();
-        // if (edge.e.equals(e)) {
-        // edgeItr.remove();
-        // removed = true;
-        // }
-        // }
-
-        for (Edge edge : edgeMap.remove(e)) {
+        Set<Edge> eSet = edgeMap.remove(e);
+        if (eSet != null) {
+            for (Edge edge : eSet) {
+                vertexMap.get(edge.v1).remove(edge);
+                vertexMap.get(edge.v2).remove(edge);
+            } 
             modified = true;
-            vertexMap.get(edge.v1).remove(edge);
-            vertexMap.get(edge.v2).remove(edge);
         }
 
         checkRep();
@@ -493,6 +386,14 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
         // checkRep();
         // return result;
     }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return vertexMap.keySet().toString() + "\n" + edgeMap.toString();
+    }
 
     /**
      * Returns a set of edge values between two vertices in the graph.
@@ -504,15 +405,15 @@ public class BasicUndirectedGraph<V, E> implements Graph<V,E> {
     private Set<E> edgesBetween(V v1, V v2) {
         Set<E> edgesBetween = new HashSet<E>();
 
-        Set<Edge> intersection = vertexMap.get(v1);
-        intersection.retainAll(vertexMap.get(v2));
-
-        for (Edge edge : intersection) {
-            edgesBetween.add(edge.e);
+        if (containsVertex(v1) && containsVertex(v2)) {
+            Set<Edge> intersection = new HashSet<Edge>(vertexMap.get(v1));
+            intersection.retainAll(vertexMap.get(v2));
+            for (Edge edge : intersection) {
+                edgesBetween.add(edge.e);
+            }
         }
 
         return edgesBetween;
-
     }
 
     /**
