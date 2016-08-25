@@ -204,7 +204,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         }
-        return !edgesBetween(v1, v2).isEmpty();
+        return !intersection(v1, v2).isEmpty();
     }
 
     @Override
@@ -239,7 +239,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         } else if (!(containsVertex(v1) && containsVertex(v2))) {
             return null;
         }
-        return edgesBetween(v1, v2);
+        return extractEdges(intersection(v1, v2));
     }
 
     @SuppressWarnings("unchecked")
@@ -248,9 +248,9 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
         } else if (containsVertex(v1) && containsVertex(v2)) {
-            Set<E> edges = edgesBetween(v1, v2);
+            Set<Edge> edges = intersection(v1, v2);
             if (!edges.isEmpty()) {
-                return (E) edges.toArray()[0];
+                return ((Edge) edges.toArray()[0]).e;
             }
         }
         return null;
@@ -282,10 +282,23 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return null;
         }
 
-        Set<E> removedEdgeSet = edgesBetween(v1, v2);
-        removeAllEdges(removedEdgeSet);
+        Set<Edge> edges = intersection(v1, v2);
+        
+        vertexMap.get(v1).removeAll(edges);
+        vertexMap.get(v2).removeAll(edges);
+        
+        for (Edge edge : edges) {
+            // remove edge from set
+            edgeMap.get(edge.e).remove(edge);
+            
+            // remove mapping if made empty
+            if (edgeMap.get(edge.e).isEmpty()) {
+                edgeMap.remove(edge.e);
+            }
+        }
+        
         checkRep();
-        return removedEdgeSet;
+        return extractEdges(edges);
     }
 
     @Override
@@ -402,17 +415,31 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
      * @param v2 the second vertex value
      * @return set of edge values between vertices v1 and v2
      */
-    private Set<E> edgesBetween(V v1, V v2) {
-        Set<E> edgesBetween = new HashSet<E>();
+    private Set<Edge> intersection(V v1, V v2) {
+        Set<Edge> intersection = new HashSet<Edge>();
 
         if (containsVertex(v1) && containsVertex(v2)) {
-            Set<Edge> intersection = new HashSet<Edge>(vertexMap.get(v1));
-            intersection.retainAll(vertexMap.get(v2));
-            for (Edge edge : intersection) {
-                edgesBetween.add(edge.e);
+            
+            if (v1.equals(v2)) {
+                for (Edge edge : vertexMap.get(v1)) {
+                    if (edge.v1.equals(edge.v2)) {
+                        intersection.add(edge);
+                    }
+                }
+            } else {
+                intersection.addAll(vertexMap.get(v1));
+                intersection.retainAll(vertexMap.get(v2));
             }
         }
 
+        return intersection;
+    }
+    
+    private Set<E> extractEdges(Set<Edge> edges) {
+        Set<E> edgesBetween = new HashSet<E>();
+        for (Edge edge : edges) {
+            edgesBetween.add(edge.e);
+        }
         return edgesBetween;
     }
 
