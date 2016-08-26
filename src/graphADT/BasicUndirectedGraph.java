@@ -291,7 +291,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             // remove edge from set
             edgeMap.get(edge.e).remove(edge);
             
-            // remove mapping if made empty
+            // remove mapping if now empty
             if (edgeMap.get(edge.e).isEmpty()) {
                 edgeMap.remove(edge.e);
             }
@@ -308,24 +308,14 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         if (vertices == null) {
             throw new NullPointerException("Vertex collection null");
         }
-
+        
         boolean modified = false;
-
-        // for (V vertex : vertices) {
-        // if (removeVertex(vertex)) {
-        // modified = true;
-        // }
-        // }
-
         for (V vertex : vertices) {
-            for (Edge edge : vertexMap.remove(vertex)) {
-                // E e = edge.e;
-                // V v2 = edge.v2;
-                vertexMap.get(edge.v2).remove(edge);
-                edgeMap.get(edge.e).remove(edge);
+            if (this.removeVertex(vertex)) {
+                modified = true;
             }
         }
-
+        checkRep();
         return modified;
     }
 
@@ -336,14 +326,19 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
      */
     @Override
     public boolean removeEdge(E e) {
+        
+        if (!edgeMap.containsKey(e)) {
+            return false;
+        }
+        
         boolean modified = false;
         Set<Edge> eSet = edgeMap.remove(e);
         if (eSet != null) {
+            modified = true;
             for (Edge edge : eSet) {
                 vertexMap.get(edge.v1).remove(edge);
                 vertexMap.get(edge.v2).remove(edge);
             } 
-            modified = true;
         }
 
         checkRep();
@@ -379,22 +374,31 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
     @Override
     public boolean removeVertex(V v) {
         // gather up and remove any Edges touching v
-        // if v == null or v !exist in graph, internal edge set is empty
-        // edgeSet.remove(internalEdgeSet(v));
-        // boolean result = vertexSet.remove(v);
 
         if (!vertexMap.containsKey(v)) {
             return false;
-        } else {
-            // boolean result = false;
-            for (Edge edge : vertexMap.remove(v)) {
-                vertexMap.get(edge.v2).remove(edge);
+        }
+        
+        boolean modified = false;
+        Set<Edge> edgesToRemove = vertexMap.remove(v);
+        
+        if (edgesToRemove != null) {
+            modified = true;
+            for (Edge edge : edgesToRemove) {
+                // remove edge from matching vertex
+                if (edge.v1.equals(edge.v2)) {
+                    // TODO: special case
+                } else if (v.equals(edge.v1)) {
+                    vertexMap.get(edge.v2).remove(edge);
+                } else {
+                    vertexMap.get(edge.v1).remove(edge);
+                }
+                // remove edge from edge mapping
                 edgeMap.get(edge.e).remove(edge);
             }
-
-            checkRep();
-            return true;
         }
+        checkRep();
+        return modified;
 
         // checkRep();
         // return result;
