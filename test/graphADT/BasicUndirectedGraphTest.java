@@ -1110,7 +1110,7 @@ public class BasicUndirectedGraphTest {
     }
 
     /**
-     * Tests removing all edges from graph functionality
+     * Unit test for removing all edges from graph functionality
      */
     @Test
     public void removeAllEdges() {
@@ -1377,7 +1377,7 @@ public class BasicUndirectedGraphTest {
     }
 
     /**
-     * Tests removing all vertices from graph functionality
+     * Unit test for removing all vertices from graph functionality
      */
     @Test
     public void removeAllVertices() {
@@ -1640,7 +1640,7 @@ public class BasicUndirectedGraphTest {
         assertNull(testGraphStringString.removeEdge(strings[0], "three-four"));
         assertNull(testGraphStringDouble.removeEdge(strings[0], "three-four"));
         assertNull(testGraphIntegerInteger.removeEdge(3, 4));
-        
+
         /*
          * Remove edge already removed
          */
@@ -1648,16 +1648,177 @@ public class BasicUndirectedGraphTest {
         testGraphStringStringNull.removeEdge(strings[0], strings[1]);
         assertNull(
                 testGraphStringStringNull.removeEdge(strings[0], strings[1]));
-        
+
         testGraphStringString.removeEdge(strings[0], strings[1]);
         assertNull(testGraphStringString.removeEdge(strings[0], strings[1]));
-        
+
         testGraphStringDouble.removeEdge(strings[0], strings[1]);
         assertNull(testGraphStringDouble.removeEdge(strings[0], strings[1]));
-        
-        testGraphIntegerInteger.removeEdge(integers[0], integers[1]);
-        assertNull(testGraphIntegerInteger.removeEdge(integers[0], integers[1]));
 
+        testGraphIntegerInteger.removeEdge(integers[0], integers[1]);
+        assertNull(
+                testGraphIntegerInteger.removeEdge(integers[0], integers[1]));
+
+        /*
+         * Remove a duplicately labeled edge
+         */
+        clearGraphData();
+        loadVertices();
+        testGraphStringString.addEdge(strings[0], strings[1], "duplicate-edge");
+        testGraphStringString.addEdge(strings[1], strings[2], "duplicate-edge");
+        assertEquals("duplicate-edge",
+                testGraphStringString.removeEdge(strings[0], strings[1]));
+        assertTrue(testGraphStringString.edgeSet().contains("duplicate-edge"));
+        assertNull(testGraphStringString.getEdge(strings[0], strings[1]));
+        assertEquals("duplicate-edge",
+                testGraphStringString.getEdge(strings[1], strings[2]));
+
+        /*
+         * Test NullPointerException thrown if trying to remove edge when vertex
+         * 1 or 2, or both, are null
+         */
+        reloadGraphData();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            try {
+                testGraphStringStringNull.removeEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringStringNull.removeEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringString.removeEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringString.removeEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphStringDouble.removeEdge(strings[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphStringDouble.removeEdge(null, strings[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+
+            try {
+                testGraphIntegerInteger.removeEdge(integers[i], null);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+            try {
+                testGraphIntegerInteger.removeEdge(null, integers[i]);
+                fail("Expected NullPointerException!");
+            } catch (NullPointerException npe) {
+                assertEquals("Vertex value null", npe.getMessage());
+            }
+        }
+        try {
+            testGraphStringStringNull.removeEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringString.removeEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphStringDouble.removeEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+        try {
+            testGraphIntegerInteger.removeEdge(null, null);
+            fail("Expected NullPointerException!");
+        } catch (NullPointerException npe) {
+            assertEquals("Vertex value null", npe.getMessage());
+        }
+    }
+
+    /**
+     * Unit test for removing specific vertex from graph
+     */
+    @Test
+    public void removeVertex() {
+        /*
+         * Remove vertex from new graph
+         */
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertFalse(testGraphStringStringNull.removeVertex(strings[i]));
+            assertFalse(testGraphStringString.removeVertex(strings[i]));
+            assertFalse(testGraphStringDouble.removeVertex(strings[i]));
+            assertFalse(testGraphIntegerInteger.removeVertex(integers[i]));
+        }
+
+        /*
+         * Remove vertex from loaded graph
+         */
+        loadVertices();
+        for (int i = 0; i <= 2; i++) { // i = {0, 1, 2}
+            assertTrue(testGraphStringStringNull.removeVertex(strings[i]));
+            assertTrue(testGraphStringString.removeVertex(strings[i]));
+            assertTrue(testGraphStringDouble.removeVertex(strings[i]));
+            assertTrue(testGraphIntegerInteger.removeVertex(integers[i]));
+        }
+
+        /*
+         * Remove vertex from graph, vertex is null
+         */
+        clearGraphData();
+        loadVertices();
+        assertFalse(testGraphStringStringNull.removeVertex(null));
+        assertFalse(testGraphStringString.removeVertex(null));
+        assertFalse(testGraphStringDouble.removeVertex(null));
+        assertFalse(testGraphIntegerInteger.removeVertex(null));
+
+        /*
+         * Remove vertex from loaded graph, assert connected edges removed
+         */
+        clearGraphData();
+        loadVertices();
+        testGraphStringString.addEdge(strings[0], strings[1], "edge1");
+        testGraphStringString.addEdge(strings[0], strings[2], "edge2");
+        testGraphStringString.removeVertex(strings[0]);
+        assertFalse(testGraphStringString.vertexSet().contains(strings[0]));
+        assertTrue(testGraphStringString.edgeSet().isEmpty());
+        
+        clearGraphData();
+        loadVertices();
+        testGraphStringString.addEdge(strings[0], strings[1], "edge1");
+        testGraphStringString.addEdge(strings[0], strings[2], "edge2");
+        testGraphStringString.addEdge(strings[1], strings[2], "edge3");
+        testGraphStringString.removeVertex(strings[0]);
+        assertEquals(1, testGraphStringString.edgeSet().size());
+        assertTrue(testGraphStringString.edgeSet().contains("edge3"));
+        
+        /*
+         * Remove vertex with self-edges
+         */
+        clearGraphData();
+        loadVertices();
+        testGraphStringString.addEdge(strings[0], strings[0], "self-edge");
     }
 
     /**

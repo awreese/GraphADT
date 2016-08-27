@@ -371,8 +371,6 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
     @Override
     public boolean removeVertex(V v) {
-        // gather up and remove any Edges touching v
-
         if (!vertexMap.containsKey(v)) {
             return false;
         }
