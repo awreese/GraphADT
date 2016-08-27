@@ -1,8 +1,10 @@
 package graphADT;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -242,20 +244,17 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         return extractEdges(intersection(v1, v2));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public E getEdge(V v1, V v2) throws NullPointerException {
         if (v1 == null || v2 == null) {
             throw new NullPointerException("Vertex value null");
-        } else if (containsVertex(v1) && containsVertex(v2)) {
-            Set<Edge> edges = intersection(v1, v2);
-            if (!edges.isEmpty()) {
-                return ((Edge) edges.toArray()[0]).e;
-            }
+        } else if (!(containsVertex(v1) && containsVertex(v2))) {
+            return null;
         }
-        return null;
+        Edge edge = getEdge(intersection(v1, v2));
+        return (edge != null) ? edge.e : null;
     }
-
+    
     @Override
     public boolean removeAllEdges(Collection<? extends E> edges)
             throws NullPointerException {
@@ -353,22 +352,21 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return null;
         }
 
-        E returnValue = null;
-        // Iterator<Edge> edgeItr = this.edgeSet.iterator();
-        //
-        // while (edgeItr.hasNext()) {
-        // Edge edge = edgeItr.next();
-        //
-        // if ((edge.v1.equals(v1) && edge.v2.equals(v2))
-        // || (edge.v1.equals(v2) && edge.v2.equals(v1))) {
-        // returnValue = edge.e;
-        // edgeItr.remove();
-        // break;
-        // }
-        // }
+        Edge edge = getEdge(intersection(v1, v2));
+        
+        if (edge == null) {
+            return null;
+        }
+        vertexMap.get(edge.v1).remove(edge);
+        vertexMap.get(edge.v2).remove(edge);
+        edgeMap.get(edge.e).remove(edge);
+        // remove mapping if now empty
+        if (edgeMap.get(edge.e).isEmpty()) {
+            edgeMap.remove(edge.e);
+        }
 
         checkRep();
-        return returnValue;
+        return edge.e;
     }
 
     @Override
@@ -395,13 +393,14 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
                 }
                 // remove edge from edge mapping
                 edgeMap.get(edge.e).remove(edge);
+                // remove mapping if now empty
+                if (edgeMap.get(edge.e).isEmpty()) {
+                    edgeMap.remove(edge.e);
+                }
             }
         }
         checkRep();
         return modified;
-
-        // checkRep();
-        // return result;
     }
     
     /* (non-Javadoc)
@@ -445,6 +444,15 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             edgesBetween.add(edge.e);
         }
         return edgesBetween;
+    }
+    
+    private Edge getEdge(Set<Edge> edgeSet) {
+        List<Edge> edgeList = new ArrayList<Edge>(edgeSet);
+        if (edgeList.isEmpty()) {
+            return null;
+        } else {
+            return edgeList.get(0);
+        }
     }
 
     /**
