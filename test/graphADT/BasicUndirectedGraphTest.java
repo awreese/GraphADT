@@ -1782,6 +1782,16 @@ public class BasicUndirectedGraphTest {
             assertTrue(testGraphStringDouble.removeVertex(strings[i]));
             assertTrue(testGraphIntegerInteger.removeVertex(integers[i]));
         }
+        
+        /*
+         * Remove vertex from graph, vertex !exist in graph
+         */
+        clearGraphData();
+        loadVertices();
+        assertFalse(testGraphStringStringNull.removeVertex("four"));
+        assertFalse(testGraphStringString.removeVertex("four"));
+        assertFalse(testGraphStringDouble.removeVertex("four"));
+        assertFalse(testGraphIntegerInteger.removeVertex(4));
 
         /*
          * Remove vertex from graph, vertex is null
@@ -1811,6 +1821,8 @@ public class BasicUndirectedGraphTest {
         testGraphStringString.addEdge(strings[1], strings[2], "edge3");
         testGraphStringString.removeVertex(strings[0]);
         assertEquals(1, testGraphStringString.edgeSet().size());
+        assertFalse(testGraphStringString.edgeSet().contains("edge1"));
+        assertFalse(testGraphStringString.edgeSet().contains("edge2"));
         assertTrue(testGraphStringString.edgeSet().contains("edge3"));
         
         /*
@@ -1819,6 +1831,16 @@ public class BasicUndirectedGraphTest {
         clearGraphData();
         loadVertices();
         testGraphStringString.addEdge(strings[0], strings[0], "self-edge");
+        testGraphStringString.removeVertex(strings[0]);
+        assertTrue(testGraphStringString.edgeSet().isEmpty());
+        assertFalse(testGraphStringString.containsEdge("self-edge"));
+        
+        clearGraphData();
+        loadVertices();
+        testGraphStringString.addEdge(strings[0], strings[0], "self-edge");
+        testGraphStringString.addEdge(strings[1], strings[1], "self-edge");
+        testGraphStringString.removeVertex(strings[0]);
+        assertTrue(testGraphStringString.containsEdge("self-edge"));
     }
 
     /**
@@ -1898,7 +1920,6 @@ public class BasicUndirectedGraphTest {
             this.d = d.clone();
             this.i = i.clone();
         }
-
     }
-
+    
 }

@@ -11,14 +11,23 @@ import java.util.Set;
 /**
  * BasicUndirectedGraph<V,E> represents a basic mutable undirected multi-graph.
  * While it can store more advanced vertex and edge object types, this class
- * only supports the basic graph operations defined in graph interface. This
- * graph is capable of storing multiple edges between vertices, but doesn't
- * allow for duplicate edges.<br/>
+ * only supports the basic graph operations defined in abstract graph interface.
+ * This graph stores non-null vertex values and null-able edge values, and is
+ * capable of storing multiple non-duplicate edges between vertices but allows
+ * duplicate edges. <br/>
  * 
  * <h5>Abstract Invariant:</h5>
+ * foreach vertex in graph
  * <ul>
- * <li>foreach vertex v in graph, v is not null</li>
- * <li>foreach edge e between vertices in graph, e is not null</li>
+ * <li>vertex is not null</li>
+ * <li>vertex value is not null</li>
+ * <li>vertex value is unique</li>
+ * </ul>
+ * foreach edge connecting vertices in graph
+ * <ul>
+ * <li>edge is not null</li>
+ * <li>edge value can be null</li>
+ * <li>edge vertices in graph</li>
  * </ul>
  * 
  * @author Drew Reese
@@ -114,7 +123,9 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return BasicUndirectedGraph.this;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.Object#toString()
          */
         @Override
@@ -124,20 +135,42 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
     }
 
-    /* internal representation of basic undirected graph */
+    /*
+     * Internal representation of basic undirected graph
+     * 
+     * vertexMap - maps vertex value to a set of it's connected edges. edgeMap -
+     * maps edge value to a set of edges containing that value.
+     */
     private Map<V,Set<Edge>> vertexMap;
     private Map<E,Set<Edge>> edgeMap;
 
-    // Abstraction Function:
-    // A basic undirected graph is an ADT that contains both vertexSet and the
-    // edges between them. This graph stores a set of vertexSet and a set of
-    // edges.
+    /*
+     * Abstraction Function:
+     * 
+     * A basic undirected graph is an ADT that contains both vertices and the
+     * edges between them. This graph stores a vertex set and an edge set. The
+     * vertex set is represented by a Key-Value store where the vertex value is
+     * the key and a set of edges connecting that vertex is the value. Likewise,
+     * the edge set is represented by a Key-Value store where the edge value is
+     * the key and a set of edges representing that edge value is the key.
+     */
 
     // Representation Invariant:
-    // foreach vertex v in vertexSet, v != null
-    // foreach edge e in edges, e != null
-    // vertex v1 in vertexSet
-    // vertex v2 in vertexSet
+    //
+    // vertex set = {v_1, v_2, v_3, ..., v_n}
+    // edge set = {e_1, e_2, e_3, ..., e_n}
+    // edge value = (e_i, v_j, v_k) where
+    // e_i element of edge set
+    // v_j and v_k elements of vertex set
+    //
+    // foreach vertex v in vertexMap
+    // v != null
+    // v element of vertex set
+    //
+    // foreach edge e in edgeMap
+    // e != null
+    // e.v1 in vertexMap
+    // e.v2 in vertexMap
 
     public BasicUndirectedGraph() {
         this.vertexMap = new HashMap<V,Set<Edge>>();
@@ -174,18 +207,21 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return false;
         }
 
-        // boolean result = edgeSet.add(new Edge(v1, v2, e));
-        // checkRep();
-        // return result;
-
         if (!edgeMap.containsKey(e)) {
             edgeMap.put(e, new HashSet<Edge>());
         }
+        
         Edge newEdge = new Edge(v1, v2, e);
         boolean modified = edgeMap.get(e).add(newEdge);
+        
         if (modified) {
             vertexMap.get(v1).add(newEdge);
             vertexMap.get(v2).add(newEdge);
+        } else {
+            // adding new edge failed, undo edgeMap changes if just mapped
+            if (edgeMap.get(e).isEmpty()) {
+                edgeMap.remove(e);
+            }
         }
         checkRep();
         return modified;
@@ -226,7 +262,6 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         } else if (!containsVertex(v)) {
             return null;
         }
-
         Set<E> returnEdgeSet = new HashSet<E>();
         for (Edge e : vertexMap.get(v)) {
             returnEdgeSet.add(e.e);
@@ -254,7 +289,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         Edge edge = getEdge(intersection(v1, v2));
         return (edge != null) ? edge.e : null;
     }
-    
+
     @Override
     public boolean removeAllEdges(Collection<? extends E> edges)
             throws NullPointerException {
@@ -282,20 +317,20 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         }
 
         Set<Edge> edges = intersection(v1, v2);
-        
+
         vertexMap.get(v1).removeAll(edges);
         vertexMap.get(v2).removeAll(edges);
-        
+
         for (Edge edge : edges) {
             // remove edge from set
             edgeMap.get(edge.e).remove(edge);
-            
+
             // remove mapping if now empty
             if (edgeMap.get(edge.e).isEmpty()) {
                 edgeMap.remove(edge.e);
             }
         }
-        
+
         checkRep();
         return extractEdges(edges);
     }
@@ -307,7 +342,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         if (vertices == null) {
             throw new NullPointerException("Vertex collection null");
         }
-        
+
         boolean modified = false;
         for (V vertex : vertices) {
             if (this.removeVertex(vertex)) {
@@ -325,11 +360,11 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
      */
     @Override
     public boolean removeEdge(E e) {
-        
+
         if (!edgeMap.containsKey(e)) {
             return false;
         }
-        
+
         boolean modified = false;
         Set<Edge> eSet = edgeMap.remove(e);
         if (eSet != null) {
@@ -337,7 +372,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             for (Edge edge : eSet) {
                 vertexMap.get(edge.v1).remove(edge);
                 vertexMap.get(edge.v2).remove(edge);
-            } 
+            }
         }
 
         checkRep();
@@ -352,11 +387,12 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return null;
         }
 
+        // get a single edge from the intersection of the vertices
         Edge edge = getEdge(intersection(v1, v2));
-        
         if (edge == null) {
             return null;
         }
+        
         vertexMap.get(edge.v1).remove(edge);
         vertexMap.get(edge.v2).remove(edge);
         edgeMap.get(edge.e).remove(edge);
@@ -374,16 +410,17 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         if (!vertexMap.containsKey(v)) {
             return false;
         }
-        
+
         boolean modified = false;
         Set<Edge> edgesToRemove = vertexMap.remove(v);
-        
+
         if (edgesToRemove != null) {
             modified = true;
             for (Edge edge : edgesToRemove) {
                 // remove edge from matching vertex
                 if (edge.v1.equals(edge.v2)) {
-                    // TODO: special case
+                    // special self-edge case
+                    // do nothing since already removed above
                 } else if (v.equals(edge.v1)) {
                     vertexMap.get(edge.v2).remove(edge);
                 } else {
@@ -400,27 +437,29 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         checkRep();
         return modified;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return vertexMap.keySet().toString() + "\n" + edgeMap.toString();
+        return vertexMap.keySet() + "\n" + edgeMap;
     }
 
     /**
-     * Returns a set of edge values between two vertices in the graph.
+     * Returns a set of edges between two vertices in the graph.
      * 
      * @param v1 the first vertex value
      * @param v2 the second vertex value
-     * @return set of edge values between vertices v1 and v2
+     * @return set of edges between vertices v1 and v2
      */
     private Set<Edge> intersection(V v1, V v2) {
         Set<Edge> intersection = new HashSet<Edge>();
 
         if (containsVertex(v1) && containsVertex(v2)) {
-            
+
             if (v1.equals(v2)) {
                 for (Edge edge : vertexMap.get(v1)) {
                     if (edge.v1.equals(edge.v2)) {
@@ -435,7 +474,13 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
         return intersection;
     }
-    
+
+    /**
+     * Extracts and returns a set of edge values
+     * 
+     * @param edges set of edges to extract values from
+     * @return
+     */
     private Set<E> extractEdges(Set<Edge> edges) {
         Set<E> edgesBetween = new HashSet<E>();
         for (Edge edge : edges) {
@@ -443,14 +488,13 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
         }
         return edgesBetween;
     }
-    
+
+    /**
+     * Returns a single edge from a set of edges
+     */
     private Edge getEdge(Set<Edge> edgeSet) {
         List<Edge> edgeList = new ArrayList<Edge>(edgeSet);
-        if (edgeList.isEmpty()) {
-            return null;
-        } else {
-            return edgeList.get(0);
-        }
+        return edgeList.isEmpty() ? null : edgeList.get(0);
     }
 
     /**
