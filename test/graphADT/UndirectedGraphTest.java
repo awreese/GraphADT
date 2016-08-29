@@ -17,16 +17,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class BasicUndirectedGraphTest {
+public class UndirectedGraphTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     // test graphs
-    BasicUndirectedGraph<String,String>   testGraphStringString;
-    BasicUndirectedGraph<String,String>   testGraphStringStringNull;
-    BasicUndirectedGraph<String,Double>   testGraphStringDouble;
-    BasicUndirectedGraph<Integer,Integer> testGraphIntegerInteger;
+    UndirectedGraph<String,String>   testGraphStringString;
+    UndirectedGraph<String,String>   testGraphStringStringNull;
+    UndirectedGraph<String,Double>   testGraphStringDouble;
+    UndirectedGraph<Integer,Integer> testGraphIntegerInteger;
 
     // test data sets
     String[]  strings  = { "one", "two", "three" };
@@ -38,14 +38,14 @@ public class BasicUndirectedGraphTest {
      */
     @Before
     public void setUp() {
-        testGraphStringStringNull = new BasicUndirectedGraph<String,String>();
-        testGraphStringString = new BasicUndirectedGraph<String,String>();
-        testGraphStringDouble = new BasicUndirectedGraph<String,Double>();
-        testGraphIntegerInteger = new BasicUndirectedGraph<Integer,Integer>();
+        testGraphStringStringNull = new UndirectedGraph<String,String>();
+        testGraphStringString = new UndirectedGraph<String,String>();
+        testGraphStringDouble = new UndirectedGraph<String,Double>();
+        testGraphIntegerInteger = new UndirectedGraph<Integer,Integer>();
     }
 
     /**
-     * Unit test for BasicUndirectedGraph constructor
+     * Unit test for UndirectedGraph constructor
      */
     @Test
     public void constructor() {
@@ -80,8 +80,8 @@ public class BasicUndirectedGraphTest {
         }
 
         // try graph of more complex objects
-        BasicUndirectedGraph<ComplexObject,String> complexObjectGraph;
-        complexObjectGraph = new BasicUndirectedGraph<ComplexObject,String>();
+        UndirectedGraph<ComplexObject,String> complexObjectGraph;
+        complexObjectGraph = new UndirectedGraph<ComplexObject,String>();
         ComplexObject co = new ComplexObject(strings, doubles, integers);
         assertTrue(complexObjectGraph.addVertex(co));
 
@@ -318,7 +318,7 @@ public class BasicUndirectedGraphTest {
         assertFalse(testGraphStringDouble.containsEdge(null));
         assertFalse(testGraphIntegerInteger.containsEdge(null));
 
-        ///// TESTING containsEdge(e) /////
+        ///// TESTING containsEdge(v1, v2) /////
         /*
          * Test negative edge (v1//v2, v2//v1) containment in new graph
          */
@@ -510,20 +510,25 @@ public class BasicUndirectedGraphTest {
         assertFalse(testGraphIntegerInteger.vertexSet().contains(4));
 
         /*
-         * Test immutability of vertex set of graph
+         * Test mutability of vertex set of graph
          * 
          * (1) Test by removing a vertex from the vertex set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          * 
          * (2) Test removing collection from vertex set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          */
         Set<String> vSet;
 
         // (1)
+        clearGraphData();
+        loadVertices();
         vSet = testGraphStringString.vertexSet();
         vSet.remove(strings[2]);
         assertTrue(testGraphStringString.containsVertex(strings[2]));
+        
+        testGraphStringString.removeVertex(strings[0]);
+        assertTrue(vSet.contains(strings[0]));
 
         // (2)
         clearGraphData();
@@ -533,6 +538,12 @@ public class BasicUndirectedGraphTest {
         for (String s : strings) {
             assertTrue(testGraphStringString.containsVertex(s));
         }
+        
+        clearGraphData();
+        loadVertices();
+        vSet = testGraphStringString.vertexSet();
+        testGraphStringString.removeAllVertices(Arrays.asList(strings));
+        assertTrue(vSet.containsAll(Arrays.asList(strings)));
     }
 
     /**
@@ -576,13 +587,13 @@ public class BasicUndirectedGraphTest {
         assertFalse(testGraphIntegerInteger.edgeSet().contains(4));
 
         /*
-         * Test immutability of edge set of graph
+         * Test mutability of edge set of graph
          * 
          * (1) Test by removing an edge from the edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          * 
          * (2) Test removing collection from edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          */
         Set<Double> eSet;
 
@@ -590,6 +601,9 @@ public class BasicUndirectedGraphTest {
         eSet = testGraphStringDouble.edgeSet();
         eSet.remove(doubles[2]);
         assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
+        
+        testGraphStringDouble.removeEdge(doubles[0]);
+        assertTrue(eSet.contains(doubles[0]));
 
         // (2)
         reloadGraphData();
@@ -598,6 +612,11 @@ public class BasicUndirectedGraphTest {
         for (Double d : doubles) {
             assertTrue(testGraphStringDouble.containsEdge(d));
         }
+        
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet();
+        testGraphStringDouble.removeAllEdges(Arrays.asList(doubles));
+        assertTrue(eSet.containsAll(Arrays.asList(doubles)));
 
         ///// TESTING edgeSet(v) /////
         /*
@@ -702,19 +721,25 @@ public class BasicUndirectedGraphTest {
         assertTrue(testGraphIntegerInteger.edgeSet(4).isEmpty());
 
         /*
-         * Test immutability of edge set of graph
+         * Test mutability of edge set of graph
          * 
          * (1) Test by removing an edge from the edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          * 
          * (2) Test removing collection from edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          */
 
         // (1)
+        reloadGraphData();
         eSet = testGraphStringDouble.edgeSet(strings[2]);
         eSet.remove(doubles[2]);
         assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
+        
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[2]);
+        testGraphStringDouble.removeEdge(doubles[2]);
+        assertTrue(eSet.contains(doubles[2]));
 
         // (2)
         reloadGraphData();
@@ -723,6 +748,11 @@ public class BasicUndirectedGraphTest {
         for (Double d : doubles) {
             assertTrue(testGraphStringDouble.containsEdge(d));
         }
+        
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[2]);
+        testGraphStringDouble.removeAllEdges(Arrays.asList(doubles));
+        assertTrue(eSet.containsAll(Arrays.asList(new Double[]{2d,3d})));
 
         ///// TESTING edgeSet(v1, v2) /////
         /*
@@ -912,19 +942,25 @@ public class BasicUndirectedGraphTest {
         }
 
         /*
-         * Test immutability of edge set of graph
+         * Test mutability of edge set of graph
          * 
          * (1) Test by removing an edge from the edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          * 
          * (2) Test removing collection from edge set and check that the
-         * underlying graph is unaffected.
+         * underlying graph is unaffected and vice versa.
          */
 
         // (1)
+        reloadGraphData();
         eSet = testGraphStringDouble.edgeSet(strings[0], strings[2]);
         eSet.remove(doubles[2]);
         assertTrue(testGraphStringDouble.containsEdge(doubles[2]));
+        
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[0], strings[2]);
+        testGraphStringDouble.removeEdge(doubles[2]);
+        assertTrue(eSet.contains(doubles[2]));
 
         // (2)
         reloadGraphData();
@@ -933,6 +969,11 @@ public class BasicUndirectedGraphTest {
         for (Double d : doubles) {
             assertTrue(testGraphStringDouble.containsEdge(d));
         }
+        
+        reloadGraphData();
+        eSet = testGraphStringDouble.edgeSet(strings[0], strings[2]);
+        testGraphStringDouble.removeAllEdges(Arrays.asList(doubles));
+        assertTrue(eSet.containsAll(Arrays.asList(doubles[2])));
     }
 
     /**

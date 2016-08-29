@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * BasicUndirectedGraph<V,E> represents a basic mutable undirected multi-graph.
+ * UndirectedGraph<V,E> represents a basic mutable undirected multi-graph.
  * While it can store more advanced vertex and edge object types, this class
  * only supports the basic graph operations defined in abstract graph interface.
  * This graph stores non-null vertex values and null-able edge values, and is
@@ -37,7 +37,7 @@ import java.util.Set;
  * 
  */
 
-public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
+public class UndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
     // DEBUGGING EXPENSIVE CHECKREP FLAG
     private static final boolean RUN_CHECKREP = true;
@@ -93,7 +93,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             if (obj == null) {
                 return false;
             }
-            if (!(obj instanceof BasicUndirectedGraph.Edge)) {
+            if (!(obj instanceof UndirectedGraph.Edge)) {
                 return false;
             }
 
@@ -119,8 +119,8 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
             return true;
         }
 
-        private BasicUndirectedGraph<?,?> getOuterType() {
-            return BasicUndirectedGraph.this;
+        private UndirectedGraph<?,?> getOuterType() {
+            return UndirectedGraph.this;
         }
 
         /*
@@ -172,7 +172,7 @@ public class BasicUndirectedGraph<V, E> implements AbstractGraph<V,E> {
     // e.v1 in vertexMap
     // e.v2 in vertexMap
 
-    public BasicUndirectedGraph() {
+    public UndirectedGraph() {
         this.vertexMap = new HashMap<V,Set<Edge>>();
         this.edgeMap = new HashMap<E,Set<Edge>>();
         checkRep();

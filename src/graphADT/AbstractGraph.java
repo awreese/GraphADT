@@ -154,62 +154,6 @@ public interface AbstractGraph<V, E> {
      */
     E getEdge(V v1, V v2) throws NullPointerException;
 
-    /*
-     * The following methods don't make much sense in a generic graph sense.
-     * Should be defined in a graph interface that utilizes directionality
-     * and/or edge weights.
-     */
-
-    // /**
-    // *
-    // * @param e
-    // * @return
-    // * @throws NullPointerException
-    // * @throws IllegalArgumentException
-    // */
-    // Vertex<V,E> getEdgeSource(Edge<V,E> e)
-    // throws NullPointerException, IllegalArgumentException;
-
-    // /**
-    // *
-    // * @param e
-    // * @return
-    // * @throws NullPointerException
-    // * @throws IllegalArgumentException
-    // */
-    // Vertex<V,E> getEdgeTarget(Edge<V,E> e)
-    // throws NullPointerException, IllegalArgumentException;
-
-    // /**
-    // *
-    // * @param v
-    // * @return
-    // * @throws NullPointerException
-    // * @throws IllegalArgumentException
-    // */
-    // V getVertexValue(Vertex<V,E> v)
-    // throws NullPointerException, IllegalArgumentException;
-
-    // /**
-    // *
-    // * @param e
-    // * @return
-    // * @throws NullPointerException
-    // * @throws IllegalArgumentException
-    // */
-    // Double getEdgeWeight(Edge<V,E> e)
-    // throws NullPointerException, IllegalArgumentException;
-
-    // /**
-    // *
-    // * @param e
-    // * @return
-    // * @throws NullPointerException
-    // * @throws IllegalArgumentException
-    // */
-    // E getEdgeValue(Edge<V,E> e)
-    // throws NullPointerException, IllegalArgumentException;
-
     /**
      * Removes all edges in this graph that are also contained in the specified
      * edge collection.
@@ -294,37 +238,4 @@ public interface AbstractGraph<V, E> {
      */
     boolean removeVertex(V v);
 
-    /*
-     * These sub-interfaces are also overkill as AbstractGraph<V,E> can just store
-     * vertex and edge objects as well as regular java objects (String, Integer,
-     * etc...). These were a nice starting point, but should be moved to
-     * external interface classes or into specific graph classes that actually
-     * utilize them specifically.
-     */
-
-    // interface Vertex<V, E> {
-    //
-    // Edge<V,E> addEdge(Vertex<V,E> target) throws NullPointerException;
-    //
-    // boolean addEdge(Vertex<V,E> target, E e) throws NullPointerException;
-    //
-    // Set<? extends Edge<V,E>> edgeSet();
-    //
-    // Set<? extends Vertex<V,E>> targetSet();
-    //
-    // boolean containsEdge(E e);
-    //
-    // boolean connected(V v);
-    // }
-
-    // interface Edge<V, E> {
-    //
-    // Vertex<V,E> getEdgeSource();
-    //
-    // Vertex<V,E> getEdgeTarget();
-    //
-    // Double getEdgeWeight();
-    //
-    // void setWeight(Double d);
-    // }
 }
