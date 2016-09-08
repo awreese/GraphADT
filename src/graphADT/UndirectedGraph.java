@@ -40,7 +40,7 @@ import java.util.Set;
 public class UndirectedGraph<V, E> implements AbstractGraph<V,E> {
 
     // DEBUGGING EXPENSIVE CHECKREP FLAG
-    private static final boolean RUN_CHECKREP = true;
+    private static final boolean RUN_CHECKREP = false;
 
     /**
      * Edge class stores vertex pairing that defines an edge in the parent
